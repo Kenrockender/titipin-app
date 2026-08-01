@@ -26,22 +26,26 @@ export default function AdminOrders() {
       <div className="flex flex-col gap-3">
         {orders.map((o) => (
           <Card key={o.id} className="p-4">
-            <button className="flex w-full items-center gap-4 text-left" onClick={() => setOpen(open === o.id ? null : o.id)}>
-              <div className="flex -space-x-3">
-                {o.items.slice(0, 3).map((it) => /* eslint-disable-next-line @next/next/no-img-element */ (
-                  <img key={it.id} src={it.image_url} alt="" className="h-10 w-10 rounded-lg border-2 border-surface object-cover" />
-                ))}
+            <button className="flex w-full flex-col gap-3 text-left sm:flex-row sm:items-center sm:gap-4" onClick={() => setOpen(open === o.id ? null : o.id)}>
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex flex-none -space-x-3">
+                  {o.items.slice(0, 3).map((it) => /* eslint-disable-next-line @next/next/no-img-element */ (
+                    <img key={it.id} src={it.image_url} alt="" className="h-10 w-10 flex-none rounded-lg border-2 border-surface object-cover" />
+                  ))}
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate font-bold">#{shortId(o.id)} · {o.items.length} item(s)</div>
+                  <div className="truncate text-xs text-muted">{o.customer_name} · {formatDate(o.created_at)}</div>
+                </div>
               </div>
-              <div className="flex-1">
-                <div className="font-bold">#{shortId(o.id)} · {o.items.length} item(s)</div>
-                <div className="text-xs text-muted">{o.customer_name} · {formatDate(o.created_at)}</div>
+              <div className="flex flex-none items-center gap-2 sm:ml-auto">
+                <span className={`hidden rounded-full px-2.5 py-1 text-[11px] font-bold sm:inline-block ${o.delivery_method === "GoSend" ? "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400" : "bg-edge/[.05] text-muted"}`}>
+                  {o.delivery_method === "GoSend" ? "GoSend" : "Pickup"}
+                </span>
+                <StatusBadge status={o.status} />
+                <div className="w-24 text-right font-extrabold sm:w-28">{formatIDR(o.total_price_idr)}</div>
+                <Icon name={open === o.id ? "chevron-up" : "chevron-down"} size={18} className="flex-none text-faint" />
               </div>
-              <span className={`hidden rounded-full px-2.5 py-1 text-[11px] font-bold sm:inline-block ${o.delivery_method === "GoSend" ? "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400" : "bg-edge/[.05] text-muted"}`}>
-                {o.delivery_method === "GoSend" ? "GoSend" : "Pickup"}
-              </span>
-              <StatusBadge status={o.status} />
-              <div className="w-28 text-right font-extrabold">{formatIDR(o.total_price_idr)}</div>
-              <Icon name={open === o.id ? "chevron-up" : "chevron-down"} size={18} className="text-faint" />
             </button>
             {open === o.id && (
               <div className="mt-4 border-t border-edge/[.06] pt-4">
