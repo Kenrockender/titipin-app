@@ -13,6 +13,7 @@
   --cream: 250 249 247; /* #faf9f7 */
   --surface: 255 255 255; /* white cards */
   --edge: 0 0 0;        /* border/divider tint, paired with low alpha */
+  color-scheme: light;
 }
 :root.dark {
   --ink: 245 245 244;      /* #f5f5f4 */
@@ -21,6 +22,7 @@
   --cream: 12 12 13;       /* page background */
   --surface: 24 24 26;     /* card background */
   --edge: 255 255 255;     /* border/divider tint on dark bg */
+  color-scheme: dark;
 }
 html { -webkit-font-smoothing: antialiased; }
 body { background: rgb(var(--cream)); color: rgb(var(--ink)); font-family: var(--font-jakarta); transition: background-color .15s ease, color .15s ease; }

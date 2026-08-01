@@ -36,7 +36,7 @@ export default function AdminOrders() {
                 <div className="font-bold">#{shortId(o.id)} · {o.items.length} item(s)</div>
                 <div className="text-xs text-muted">{o.customer_name} · {formatDate(o.created_at)}</div>
               </div>
-              <span className={`hidden rounded-full px-2.5 py-1 text-[11px] font-bold sm:inline-block ${o.delivery_method === "GoSend" ? "bg-blue-50 text-blue-700" : "bg-edge/[.05] text-muted"}`}>
+              <span className={`hidden rounded-full px-2.5 py-1 text-[11px] font-bold sm:inline-block ${o.delivery_method === "GoSend" ? "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400" : "bg-edge/[.05] text-muted"}`}>
                 {o.delivery_method === "GoSend" ? "GoSend" : "Pickup"}
               </span>
               <StatusBadge status={o.status} />

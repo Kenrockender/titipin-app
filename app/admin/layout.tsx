@@ -42,7 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {NAV.map((n) => {
             const active = n.href === "/admin" ? path === "/admin" : path.startsWith(n.href);
             return (
-              <Link key={n.href} href={n.href} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition ${active ? "bg-brand-50 text-brand-700" : "text-muted hover:bg-edge/5"}`}>
+              <Link key={n.href} href={n.href} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition ${active ? "bg-brand-50 dark:bg-brand/15 text-brand-700 dark:text-blue-300" : "text-muted hover:bg-edge/5"}`}>
                 <Icon name={n.icon} size={18} /> {n.label}
               </Link>
             );
@@ -67,7 +67,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
           <div className="flex gap-1 overflow-x-auto">
             {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className={`flex-none rounded-lg p-2 ${path === n.href ? "bg-brand-50 text-brand-700" : "text-muted"}`}><Icon name={n.icon} size={18} /></Link>
+              <Link key={n.href} href={n.href} className={`flex-none rounded-lg p-2 ${path === n.href ? "bg-brand-50 dark:bg-brand/15 text-brand-700 dark:text-blue-300" : "text-muted"}`}><Icon name={n.icon} size={18} /></Link>
             ))}
           </div>
         </header>

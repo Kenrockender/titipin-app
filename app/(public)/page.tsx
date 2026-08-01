@@ -14,10 +14,10 @@ export default function LandingPage() {
   return (
     <main>
       {activeTrip && (
-        <div className="border-b border-brand-100 bg-gradient-to-r from-brand-50 to-white">
+        <div className="border-b border-brand-100 dark:border-brand/20 bg-gradient-to-r from-brand-50 to-white dark:from-brand/15 dark:to-transparent">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-5 py-2.5 text-[13.5px]">
             <Icon name="plane" size={16} className="text-brand" />
-            <span className="font-bold text-brand-700">Next Trip: {activeTrip.name}</span>
+            <span className="font-bold text-brand-700 dark:text-blue-300">Next Trip: {activeTrip.name}</span>
             <span className="text-faint">— Open for Pre-Orders!</span>
             <Link href="/catalog" className="ml-auto font-bold text-brand hover:underline">Pre-order now →</Link>
           </div>
@@ -60,7 +60,7 @@ export default function LandingPage() {
             { icon: "house", t: "4. Delivered Home", d: "Pay the balance, we ship it to your door in Indonesia." }
           ].map((s) => (
             <div key={s.t} className="flex flex-col gap-2">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50"><Icon name={s.icon} size={20} className="text-brand" /></span>
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand/15"><Icon name={s.icon} size={20} className="text-brand" /></span>
               <div className="font-bold">{s.t}</div>
               <div className="text-sm text-muted">{s.d}</div>
             </div>
@@ -99,7 +99,7 @@ export default function LandingPage() {
         <div className="flex flex-col items-center gap-4 rounded-3xl bg-brand px-6 py-14 text-center text-white">
           <h2 className="max-w-xl text-3xl font-extrabold tracking-tight">Can&apos;t find it? We&apos;ll hunt it down.</h2>
           <p className="max-w-md text-white/90">Paste a link or upload a screenshot. We&apos;ll send you a transparent quote within hours.</p>
-          <Link href="/request"><Button variant="outline" className="h-12 border-surface bg-surface px-7 text-brand-700">Request an Item</Button></Link>
+          <Link href="/request"><Button variant="outline" className="h-12 border-surface bg-surface px-7 text-brand-700 dark:text-blue-300">Request an Item</Button></Link>
         </div>
       </section>
     </main>

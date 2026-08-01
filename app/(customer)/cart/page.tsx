@@ -55,7 +55,7 @@ export default function CartPage() {
                 <div className="text-sm text-muted">Qty {l.quantity} · {l.product.store_location}</div>
               </div>
               <div className="text-right font-extrabold">{formatIDR(l.product.final_price_idr * l.quantity)}</div>
-              <button onClick={() => removeFromCart(l.product.id)} className="text-faint hover:text-red-600"><Icon name="trash-2" size={18} /></button>
+              <button onClick={() => removeFromCart(l.product.id)} className="text-faint hover:text-red-600 dark:hover:text-red-400"><Icon name="trash-2" size={18} /></button>
             </Card>
           ))}
 
@@ -67,7 +67,7 @@ export default function CartPage() {
                   <input type="checkbox" checked={selectedAddons.includes(a.id)}
                     onChange={(e) => setSelectedAddons(e.target.checked ? [...selectedAddons, a.id] : selectedAddons.filter((x) => x !== a.id))} />
                   <span className="flex-1 font-semibold">{a.name}</span>
-                  <span className="font-bold text-brand-700">+{formatIDR(a.price_idr)}</span>
+                  <span className="font-bold text-brand-700 dark:text-blue-300">+{formatIDR(a.price_idr)}</span>
                 </label>
               ))}
             </div>
@@ -84,9 +84,9 @@ export default function CartPage() {
                   key={opt.value}
                   type="button"
                   onClick={() => setDeliveryMethod(opt.value)}
-                  className={`rounded-lg border p-3 text-left text-sm transition ${deliveryMethod === opt.value ? "border-brand bg-brand-50" : "border-edge/10 hover:border-brand/40"}`}
+                  className={`rounded-lg border p-3 text-left text-sm transition ${deliveryMethod === opt.value ? "border-brand bg-brand-50 dark:bg-brand/15" : "border-edge/10 hover:border-brand/40"}`}
                 >
-                  <div className={`font-bold ${deliveryMethod === opt.value ? "text-brand-700" : "text-ink"}`}>{opt.label}</div>
+                  <div className={`font-bold ${deliveryMethod === opt.value ? "text-brand-700 dark:text-blue-300" : "text-ink"}`}>{opt.label}</div>
                   <div className="mt-0.5 text-xs text-muted">{opt.desc}</div>
                 </button>
               ))}
@@ -100,18 +100,18 @@ export default function CartPage() {
             <Row label="Items" value={formatIDR(itemsTotal)} />
             <Row label="Add-ons" value={formatIDR(addonTotal)} />
             <div className="flex justify-between border-t border-edge/10 pt-2 text-lg font-extrabold"><span>Total</span><span>{formatIDR(total)}</span></div>
-            <div className="mt-2 rounded-xl bg-brand-50 p-3">
-              <div className="mb-2 text-sm font-bold text-brand-700">Down payment</div>
+            <div className="mt-2 rounded-xl bg-brand-50 dark:bg-brand/15 p-3">
+              <div className="mb-2 text-sm font-bold text-brand-700 dark:text-blue-300">Down payment</div>
               <div className="mb-2 flex gap-2">
                 {[0.5, 0.6, 0.7].map((r) => (
-                  <button key={r} onClick={() => setDpRatio(r)} className={`flex-1 rounded-lg py-1.5 text-sm font-bold ${dpRatio === r ? "bg-brand text-white" : "bg-surface text-brand-700 border border-brand-100"}`}>{r * 100}%</button>
+                  <button key={r} onClick={() => setDpRatio(r)} className={`flex-1 rounded-lg py-1.5 text-sm font-bold ${dpRatio === r ? "bg-brand text-white" : "bg-surface text-brand-700 dark:text-blue-300 border border-brand-100 dark:border-brand/30"}`}>{r * 100}%</button>
                 ))}
               </div>
-              <div className="flex justify-between text-sm"><span className="text-muted">Pay now (DP)</span><span className="font-extrabold text-brand-700">{formatIDR(dp)}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-muted">Pay now (DP)</span><span className="font-extrabold text-brand-700 dark:text-blue-300">{formatIDR(dp)}</span></div>
               <div className="flex justify-between text-sm"><span className="text-muted">Pay on arrival</span><span className="font-bold">{formatIDR(total - dp)}</span></div>
             </div>
             {currentUser && !currentUser.shipping_address.trim() && (
-              <p className="rounded-lg bg-amber-50 p-2 text-center text-xs font-semibold text-amber-800">Isi alamat pengiriman di Profile dulu sebelum checkout.</p>
+              <p className="rounded-lg bg-amber-50 dark:bg-amber-500/10 p-2 text-center text-xs font-semibold text-amber-800 dark:text-amber-400">Isi alamat pengiriman di Profile dulu sebelum checkout.</p>
             )}
             <Button className="h-12" onClick={checkout}>Place Order & Pay DP</Button>
             <p className="text-center text-xs text-faint">Manual transfer / QRIS · upload proof after ordering</p>

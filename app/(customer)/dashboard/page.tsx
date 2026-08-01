@@ -22,7 +22,7 @@ export default function DashboardPage() {
           <p className="text-sm text-muted">Welcome back, {currentUser.full_name.split(" ")[0]}.</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-brand-50 px-4 py-2 text-sm"><span className="text-muted">Store credit: </span><b className="text-brand-700">{formatIDR(currentUser.store_credit_balance)}</b></div>
+          <div className="rounded-xl bg-brand-50 dark:bg-brand/15 px-4 py-2 text-sm"><span className="text-muted">Store credit: </span><b className="text-brand-700 dark:text-blue-300">{formatIDR(currentUser.store_credit_balance)}</b></div>
           <Link href="/profile"><Button variant="outline" className="h-10">Profile</Button></Link>
         </div>
       </div>

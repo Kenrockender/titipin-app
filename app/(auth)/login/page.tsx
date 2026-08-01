@@ -53,7 +53,7 @@ function LoginForm() {
         <Button className="h-11 w-full" onClick={submit} disabled={loading}>
           {loading ? "Signing in…" : "Continue with Google"}
         </Button>
-        {error && <p className="mt-3 text-center text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-3 text-center text-sm text-red-600 dark:text-red-400">{error}</p>}
       </Card>
       <p className="mt-4 text-center text-sm text-muted">No account? Signing in with Google creates one automatically.</p>
     </main>

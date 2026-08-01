@@ -66,9 +66,9 @@ export default function OrderDetail() {
 
       {/* OOS pivot */}
       {oosItem && (
-        <Card className="mb-5 border-red-200 bg-red-50 p-5">
-          <div className="flex items-center gap-2 font-bold text-red-700"><Icon name="triangle-alert" size={18} /> {oosItem.item_name} was sold out</div>
-          <p className="mt-1 text-sm text-red-700/80">Your item wasn&apos;t available overseas. Choose how you&apos;d like your {formatIDR(oosItem.locked_price_idr * oosItem.quantity)} handled:</p>
+        <Card className="mb-5 border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-500/10 p-5">
+          <div className="flex items-center gap-2 font-bold text-red-700 dark:text-red-400"><Icon name="triangle-alert" size={18} /> {oosItem.item_name} was sold out</div>
+          <p className="mt-1 text-sm text-red-700/80 dark:text-red-400/80">Your item wasn&apos;t available overseas. Choose how you&apos;d like your {formatIDR(oosItem.locked_price_idr * oosItem.quantity)} handled:</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <a href={waLink(`Hi, I'd like a cash refund for my out-of-stock item on order #${shortId(order.id)}.`)} target="_blank" rel="noreferrer"><Button variant="outline">Refund to Bank</Button></a>
             <Button variant="danger" onClick={() => refundAsStoreCredit(order.id, oosItem.id)}>Keep as Store Credit</Button>
@@ -104,13 +104,13 @@ export default function OrderDetail() {
         {order.local_shipping_fee_idr != null && <Row label="Local shipping" value={formatIDR(order.local_shipping_fee_idr)} />}
         <div className="my-2 border-t border-edge/10" />
         {(needsDP || needsFinal) && (
-          <div className="rounded-xl bg-brand-50 p-4">
+          <div className="rounded-xl bg-brand-50 dark:bg-brand/15 p-4">
             <div className="mb-1 flex items-center justify-between">
-              <span className="font-bold text-brand-700">{needsDP ? "Pay Down Payment" : "Pay Final Balance"}</span>
-              <span className="text-lg font-extrabold text-brand-700">{formatIDR(needsDP ? order.total_dp_required_idr : finalBalance)}</span>
+              <span className="font-bold text-brand-700 dark:text-blue-300">{needsDP ? "Pay Down Payment" : "Pay Final Balance"}</span>
+              <span className="text-lg font-extrabold text-brand-700 dark:text-blue-300">{formatIDR(needsDP ? order.total_dp_required_idr : finalBalance)}</span>
             </div>
             <p className="mb-3 text-xs text-muted">Transfer to <b>{BANK_ACCOUNT_INFO}</b> or scan QRIS, then upload your receipt.</p>
-            <label className="mb-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brand/40 py-4 text-sm font-semibold text-brand-700 hover:bg-surface">
+            <label className="mb-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brand/40 py-4 text-sm font-semibold text-brand-700 dark:text-blue-300 hover:bg-surface">
               <Icon name="upload" size={16} /> {receipt ? "Receipt attached ✓" : "Upload transfer receipt"}
               <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onload = () => setReceipt(r.result as string); r.readAsDataURL(f); } }} />
             </label>

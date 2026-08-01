@@ -36,7 +36,7 @@ export default function RequestPage() {
 
   if (submitted) return (
     <main className="mx-auto max-w-lg px-5 py-24 text-center">
-      <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100"><Icon name="check" size={30} className="text-green-600" /></span>
+      <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-500/15"><Icon name="check" size={30} className="text-green-600 dark:text-green-400" /></span>
       <h1 className="text-2xl font-extrabold">Request submitted!</h1>
       <p className="mt-2 text-muted">We&apos;ll review your item and send a transparent quote to your dashboard and WhatsApp within a few hours.</p>
       <div className="mt-6 flex justify-center gap-3">
@@ -90,7 +90,7 @@ export default function RequestPage() {
         </form>
       </Card>
       <style jsx global>{`
-        .input { width:100%; height:44px; border-radius:12px; border:1.5px solid rgba(0,0,0,.12); padding:0 14px; font-size:14px; background:#fff; outline:none; }
+        .input { width:100%; height:44px; border-radius:12px; border:1.5px solid rgb(var(--edge) / .12); padding:0 14px; font-size:14px; background:transparent; color:rgb(var(--ink)); outline:none; }
         .input:focus { border-color:#2563EB; }
       `}</style>
     </main>

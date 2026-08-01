@@ -46,7 +46,7 @@ function ProfileForm() {
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={currentUser.photo_url} alt={currentUser.full_name} className="h-12 w-12 rounded-full object-cover" referrerPolicy="no-referrer" />
           ) : (
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-lg font-extrabold text-brand-700">{currentUser.full_name[0]}</span>
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 dark:bg-brand/15 text-lg font-extrabold text-brand-700 dark:text-blue-300">{currentUser.full_name[0]}</span>
           )}
           <div>
             <div className="font-bold">{currentUser.full_name}</div>
@@ -56,7 +56,7 @@ function ProfileForm() {
       </Card>
       <Card className="p-5">
         {needsAddress && (
-          <div className="mb-4 flex items-center gap-2 rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-800">
+          <div className="mb-4 flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-500/10 p-3 text-sm font-semibold text-amber-800 dark:text-amber-400">
             <Icon name="triangle-alert" size={16} /> Isi alamat pengiriman dulu sebelum checkout.
           </div>
         )}
@@ -66,9 +66,9 @@ function ProfileForm() {
         <label className="mb-1 block text-xs font-semibold text-muted">Shipping address</label>
         <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Alamat lengkap penerima" rows={3} className="profile-input mb-3" />
         <Button onClick={save}>Save</Button>
-        {saved && <span className="ml-3 text-sm font-semibold text-emerald-600">Saved ✓</span>}
+        {saved && <span className="ml-3 text-sm font-semibold text-emerald-600 dark:text-emerald-400">Saved ✓</span>}
       </Card>
-      <style jsx global>{`.profile-input{width:100%;border-radius:12px;border:1.5px solid rgba(0,0,0,.12);padding:10px 14px;font-size:14px;outline:none}.profile-input:focus{border-color:#2563EB}`}</style>
+      <style jsx global>{`.profile-input{width:100%;border-radius:12px;border:1.5px solid rgb(var(--edge) / .12);background:transparent;color:rgb(var(--ink));padding:10px 14px;font-size:14px;outline:none}.profile-input:focus{border-color:#2563EB}`}</style>
     </main>
   );
 }

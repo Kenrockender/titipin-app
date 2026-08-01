@@ -47,19 +47,19 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
               <Icon name="plus" size={16} />
             </Button>
           ) : (
-            <div className="flex h-9 items-center gap-2.5 rounded-lg bg-brand-50 px-1">
+            <div className="flex h-9 items-center gap-2.5 rounded-lg bg-brand-50 dark:bg-brand/15 px-1">
               <button
                 onClick={() => decrementCartItem(product.id)}
                 aria-label="Decrease quantity"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-lg font-bold text-brand-700 hover:bg-surface"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-lg font-bold text-brand-700 dark:text-blue-300 hover:bg-surface"
               >
                 −
               </button>
-              <span className="min-w-[1ch] text-center text-sm font-extrabold text-brand-700">{qty}</span>
+              <span className="min-w-[1ch] text-center text-sm font-extrabold text-brand-700 dark:text-blue-300">{qty}</span>
               <button
                 onClick={() => addToCart(product)}
                 aria-label="Increase quantity"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-lg font-bold text-brand-700 hover:bg-surface"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-lg font-bold text-brand-700 dark:text-blue-300 hover:bg-surface"
               >
                 +
               </button>

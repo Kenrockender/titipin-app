@@ -47,7 +47,7 @@ export default function ShopperMode() {
           const done = items.filter((i) => i.item_status === "Secured").length;
           return (
             <div key={store} className="overflow-hidden rounded-2xl bg-surface shadow-card">
-              <div className="flex items-center gap-2 border-b border-edge/[.06] bg-brand-50 px-4 py-3">
+              <div className="flex items-center gap-2 border-b border-edge/[.06] bg-brand-50 dark:bg-brand/15 px-4 py-3">
                 <Icon name="store" size={18} className="text-brand" />
                 <span className="font-extrabold">{store}</span>
                 <Badge tone="brand">{done}/{items.length}</Badge>

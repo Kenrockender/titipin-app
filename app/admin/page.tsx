@@ -18,7 +18,7 @@ export default function AdminOverview() {
 
   const stat = (icon: string, label: string, value: string) => (
     <Card className="flex items-center gap-3 p-4">
-      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50"><Icon name={icon} size={20} className="text-brand" /></span>
+      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand/15"><Icon name={icon} size={20} className="text-brand" /></span>
       <div><div className="text-xl font-extrabold">{value}</div><div className="text-xs text-muted">{label}</div></div>
     </Card>
   );

@@ -31,7 +31,7 @@ export function Navbar() {
       href={href}
       className={
         mobile
-          ? `block rounded-lg px-3 py-2.5 text-[15px] font-semibold ${path === href ? "bg-brand-50 text-brand-700" : "text-muted hover:bg-edge/[.04] hover:text-ink"}`
+          ? `block rounded-lg px-3 py-2.5 text-[15px] font-semibold ${path === href ? "bg-brand-50 dark:bg-brand/15 text-brand-700 dark:text-blue-300" : "text-muted hover:bg-edge/[.04] hover:text-ink"}`
           : `text-sm font-semibold ${path === href ? "text-ink" : "text-muted hover:text-ink"}`
       }
     >
@@ -75,7 +75,7 @@ export function Navbar() {
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img src={currentUser.photo_url} alt={currentUser.full_name} className="h-8 w-8 rounded-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 text-xs font-extrabold text-brand-700">{currentUser.full_name[0]}</span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 dark:bg-brand/15 text-xs font-extrabold text-brand-700 dark:text-blue-300">{currentUser.full_name[0]}</span>
                 )}
               </Link>
               <button onClick={logout} className="h-9 rounded-[10px] border border-edge/15 bg-surface px-4 text-sm font-bold hover:border-ink">Logout</button>
@@ -117,7 +117,7 @@ export function Navbar() {
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={currentUser.photo_url} alt={currentUser.full_name} className="h-9 w-9 rounded-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-sm font-extrabold text-brand-700">{currentUser.full_name[0]}</span>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 dark:bg-brand/15 text-sm font-extrabold text-brand-700 dark:text-blue-300">{currentUser.full_name[0]}</span>
                   )}
                   <span className="text-sm font-bold">{currentUser.full_name}</span>
                 </Link>

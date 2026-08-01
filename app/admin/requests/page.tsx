@@ -66,7 +66,7 @@ function QuoteTool({ onQuote, rate, pricing, qty }: { onQuote: (p: number, dp: n
   const dp = calculateDP(q.totalIdr, dpRatio);
 
   return (
-    <div className="mt-4 grid gap-4 rounded-xl bg-brand-50 p-4 md:grid-cols-2">
+    <div className="mt-4 grid gap-4 rounded-xl bg-brand-50 dark:bg-brand/15 p-4 md:grid-cols-2">
       <div className="grid grid-cols-2 gap-3">
         <NumField label={`Base price (foreign)`} value={base} onChange={setBase} />
         <NumField label="Markup %" value={markup} onChange={setMarkup} />
@@ -78,10 +78,10 @@ function QuoteTool({ onQuote, rate, pricing, qty }: { onQuote: (p: number, dp: n
         <Row label={`Upside (${markup}%)`} value={formatIDR(q.markupIdr)} />
         <Row label="Flat fee" value={formatIDR(q.flatFeeIdr)} />
         <Row label={`Unit × qty ${qty}`} value={formatIDR(q.totalIdr)} />
-        <div className="my-1 border-t border-brand-100" />
-        <div className="flex justify-between font-extrabold text-brand-700"><span>Quote total</span><span>{formatIDR(q.totalIdr)}</span></div>
+        <div className="my-1 border-t border-brand-100 dark:border-brand/30" />
+        <div className="flex justify-between font-extrabold text-brand-700 dark:text-blue-300"><span>Quote total</span><span>{formatIDR(q.totalIdr)}</span></div>
         <div className="mt-2 mb-1 flex gap-1">
-          {[0.5, 0.6, 0.7].map((rr) => <button key={rr} onClick={() => setDpRatio(rr)} className={`flex-1 rounded py-1 text-xs font-bold ${dpRatio === rr ? "bg-brand text-white" : "bg-surface text-brand-700"}`}>{rr * 100}% DP</button>)}
+          {[0.5, 0.6, 0.7].map((rr) => <button key={rr} onClick={() => setDpRatio(rr)} className={`flex-1 rounded py-1 text-xs font-bold ${dpRatio === rr ? "bg-brand text-white" : "bg-surface text-brand-700 dark:text-blue-300"}`}>{rr * 100}% DP</button>)}
         </div>
         <div className="flex justify-between font-bold"><span>Required DP</span><span>{formatIDR(dp)}</span></div>
         <Button className="mt-3 w-full h-10" disabled={base <= 0} onClick={() => onQuote(q.totalIdr, dp)}>Send Quote to Customer</Button>

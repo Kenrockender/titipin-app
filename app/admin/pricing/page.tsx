@@ -25,7 +25,7 @@ export default function AdminPricing() {
           <Slider label="Default markup (upside)" suffix="%" value={draft.default_markup_percentage} min={0} max={60} onChange={(v) => { setDraft({ ...draft, default_markup_percentage: v }); setSaved(false); }} />
           <Slider label="Exchange rate buffer" suffix="%" value={draft.exchange_rate_buffer_pct} min={0} max={15} step={0.5} onChange={(v) => { setDraft({ ...draft, exchange_rate_buffer_pct: v }); setSaved(false); }} />
           <label className="text-sm font-bold text-muted">Flat jastip fee (IDR)
-            <input type="number" value={draft.default_flat_fee_idr} onChange={(e) => { setDraft({ ...draft, default_flat_fee_idr: Number(e.target.value) }); setSaved(false); }} className="mt-1 h-10 w-full rounded-lg border border-edge/15 px-3 text-ink" />
+            <input type="number" value={draft.default_flat_fee_idr} onChange={(e) => { setDraft({ ...draft, default_flat_fee_idr: Number(e.target.value) }); setSaved(false); }} className="mt-1 h-10 w-full rounded-lg border border-edge/15 bg-transparent px-3 text-ink" />
           </label>
           <Button onClick={() => { updatePricing(draft); setSaved(true); }}>{saved ? "Saved ✓" : "Save Pricing"}</Button>
         </Card>
@@ -36,7 +36,7 @@ export default function AdminPricing() {
           <Row label="Base in IDR" value={formatIDR(sample.baseIdr)} />
           <Row label={`Upside ${draft.default_markup_percentage}%`} value={formatIDR(sample.markupIdr)} />
           <Row label="Flat fee" value={formatIDR(sample.flatFeeIdr)} />
-          <div className="mt-1 flex justify-between border-t border-edge/10 pt-2 font-extrabold"><span>Customer pays</span><span className="text-brand-700">{formatIDR(sample.totalIdr)}</span></div>
+          <div className="mt-1 flex justify-between border-t border-edge/10 pt-2 font-extrabold"><span>Customer pays</span><span className="text-brand-700 dark:text-blue-300">{formatIDR(sample.totalIdr)}</span></div>
         </Card>
       </div>
       <Card className="mt-5 p-5">
@@ -56,7 +56,7 @@ export default function AdminPricing() {
                 <input
                   type="number" step="0.1" value={draftRate}
                   onChange={(e) => { setRateDrafts((d) => ({ ...d, [t.id]: Number(e.target.value) })); setRateSaved(null); }}
-                  className="h-8 w-24 rounded-lg border border-edge/15 px-2 text-right text-ink"
+                  className="h-8 w-24 rounded-lg border border-edge/15 bg-transparent px-2 text-right text-ink"
                 />
                 <span className="text-muted">IDR</span>
                 <Button
@@ -77,7 +77,7 @@ export default function AdminPricing() {
 function Slider({ label, value, min, max, step = 1, suffix, onChange }: { label: string; value: number; min: number; max: number; step?: number; suffix: string; onChange: (v: number) => void }) {
   return (
     <div>
-      <div className="mb-1 flex justify-between text-sm font-bold text-muted"><span>{label}</span><span className="text-brand-700">{value}{suffix}</span></div>
+      <div className="mb-1 flex justify-between text-sm font-bold text-muted"><span>{label}</span><span className="text-brand-700 dark:text-blue-300">{value}{suffix}</span></div>
       <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full accent-brand" />
     </div>
   );
