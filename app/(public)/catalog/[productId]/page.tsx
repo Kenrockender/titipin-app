@@ -40,7 +40,7 @@ export default function ProductDetail() {
             <Row label={`Base price (${trip?.destination_country})`} value={formatIDR(q.baseIdr)} />
             <Row label={`Jastip upside (${product.markup_percentage}%)`} value={formatIDR(q.markupIdr)} />
             <Row label="Flat jastip fee" value={formatIDR(q.flatFeeIdr)} />
-            <div className="mt-2 flex justify-between border-t border-black/10 pt-2 font-extrabold"><span>All-in price</span><span>{formatIDR(product.final_price_idr)}</span></div>
+            <div className="mt-2 flex justify-between border-t border-edge/10 pt-2 font-extrabold"><span>All-in price</span><span>{formatIDR(product.final_price_idr)}</span></div>
           </Card>
           <div className="flex items-center gap-2 text-sm text-muted"><Icon name="plane" size={15} className="text-brand" /> Est. arrival with <b className="mx-1 text-ink">{trip?.name}</b></div>
           <div className="flex items-center gap-2 text-sm text-muted"><Icon name="store" size={15} className="text-brand" /> Sourced from {product.store_location}</div>
@@ -54,9 +54,9 @@ export default function ProductDetail() {
                     key={cv.product_id}
                     href={`/catalog/${cv.product_id}`}
                     title={cv.color_name}
-                    className={`group/swatch flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition ${cv.product_id === product.id ? 'border-brand bg-brand/5 text-ink ring-1 ring-brand' : 'border-black/10 text-muted hover:border-ink hover:text-ink'}`}
+                    className={`group/swatch flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition ${cv.product_id === product.id ? 'border-brand bg-brand/5 text-ink ring-1 ring-brand' : 'border-edge/10 text-muted hover:border-ink hover:text-ink'}`}
                   >
-                    <span className="block h-3.5 w-3.5 rounded-full border border-black/10" style={{ backgroundColor: cv.hex }} />
+                    <span className="block h-3.5 w-3.5 rounded-full border border-edge/10" style={{ backgroundColor: cv.hex }} />
                     {cv.color_name}
                   </Link>
                 ))}

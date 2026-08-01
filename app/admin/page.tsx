@@ -39,7 +39,7 @@ export default function AdminOverview() {
         {PIPELINE.map((stage) => {
           const list = orders.filter((o) => o.status === stage);
           return (
-            <div key={stage} className="rounded-2xl bg-white p-3 shadow-card">
+            <div key={stage} className="rounded-2xl bg-surface p-3 shadow-card">
               <div className="mb-2 flex items-center justify-between px-1">
                 <StatusBadge status={stage} />
                 <span className="text-xs font-bold text-faint">{list.length}</span>
@@ -47,7 +47,7 @@ export default function AdminOverview() {
               <div className="flex flex-col gap-2">
                 {list.map((o) => (
                   <Link key={o.id} href={`/admin/orders?focus=${o.id}`}>
-                    <div className="rounded-xl border border-black/[.06] p-2.5 text-sm transition hover:border-brand">
+                    <div className="rounded-xl border border-edge/[.06] p-2.5 text-sm transition hover:border-brand">
                       <div className="font-bold">#{shortId(o.id)}</div>
                       <div className="flex justify-between text-xs text-muted"><span>{o.items.length} item(s)</span><span>{formatIDR(o.total_price_idr)}</span></div>
                     </div>

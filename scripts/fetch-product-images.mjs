@@ -39,18 +39,6 @@ const PRODUCTS = [
   { id: "prod-crybaby", q: "Pop Mart Crybaby blind box", pages: [
     "https://www.popmart.com/us/products/1681/crybaby-crying-again-series-vinyl-face-plush-blind-box",
   ]},
-  { id: "prod-medicube-pdrn", q: "Medicube PDRN pink peptide serum bottle", pages: [
-    "https://medicube.us/products/rose-pdrn-pink-peptide-serum",
-    "https://www.skincupid.us/products/medicube-pdrn-pink-peptide-serum-30ml",
-  ]},
-  { id: "prod-anua-oil", q: "Anua heartleaf pore control cleansing oil 200ml", pages: [
-    "https://anua.com/products/heartleaf-pore-control-cleansing-oil-200ml",
-    "https://www.skincupid.us/products/anua-heartleaf-pore-control-cleansing-oil-200ml",
-  ]},
-  { id: "prod-biodance-mask", q: "Biodance bio-collagen real deep mask box", pages: [
-    "https://biodance.com/products/biodance-bio-collagen-real-deep-mask",
-    "https://sokoglam.com/products/bio-collagen-real-deep-mask",
-  ]},
   { id: "prod-haku", q: "Shiseido HAKU Melanofocus serum white pump bottle", pages: [
     "https://japanesetaste.com/products/shiseido-haku-melanofocus-z-brightening-beauty-serum-45g",
     "https://dokodemo.world/en/item/1955900/",
@@ -149,10 +137,6 @@ const PRODUCTS = [
   { id: "prod-royce", q: "Royce Nama chocolate Au Lait box", pages: [
     "https://roycechocolate.com/products/nama-chocolate-au-lait",
   ]},
-  { id: "prod-buldak", q: "Samyang Buldak ramen variety pack", pages: [
-    "https://feelinseoul.com/products/samyang-buldak-ramen-variety-pack",
-    "https://ringko.com/products/samyang-buldak-ramen-bundles-4-flavors-5-packs",
-  ]},
   { id: "prod-pokemontcg", q: "Pokemon TCG japanese booster box sealed", pages: [] },
   { id: "prod-gundam-rg", q: "Bandai RG RX-78-2 Gundam model kit box", pages: [
     "https://www.usagundamstore.com/products/rg-1-144-01-rx-78-2-gundam",
@@ -165,10 +149,6 @@ const PRODUCTS = [
     "https://www.sk-ii.com/product/essence/facial-treatment-essence/230ml",
     "https://beautyboxkorea.com/product/sk-ii-facial-treatment-essence-230ml/53350/",
   ]},
-  { id: "prod-laneige-lip", q: "Laneige lip sleeping mask berry jar", pages: [
-    "https://us.laneige.com/products/lip-sleeping-mask",
-    "https://kbeautystudio.com/products/laneige-lip-sleeping-mask-berry-20g",
-  ]},
   { id: "prod-pokemon", q: "Pokemon Center Pikachu plush official", pages: [
     "https://www.pokemoncenter.com/product/701E12210/sitting-pikachu-poke-plush-8-in",
   ]},
@@ -176,11 +156,9 @@ const PRODUCTS = [
   { id: "prod-shiro-lily", q: "SHIRO White Lily perfume bottle white background", pages: [] },
   { id: "prod-jscent-tea", q: "J-Scent Roasted Green Tea hojicha eau de parfum bottle", pages: [] },
   { id: "prod-auxparadis", q: "Aux Paradis Osmanthus eau de parfum bottle", pages: [] },
-  { id: "prod-tamburins", q: "Tamburins egg perfume", pages: [] },
   { id: "prod-baobao", q: "BAO BAO Issey Miyake Lucent tote bag 6x6", pages: [] },
   { id: "prod-seiko-presage", q: "Seiko Presage Cocktail Time SRPB43 watch", pages: [] },
   { id: "prod-cdg-wallet", q: "Comme des Garcons classic leather wallet black SA5100", pages: [] },
-  { id: "prod-gentlemonster", q: "Gentle Monster sunglasses black", pages: [] },
   { id: "prod-pilot823", q: "Pilot Custom 823 fountain pen amber", pages: [] },
   { id: "prod-dassai45", q: "Dassai 45 junmai daiginjo 720ml sake bottle", pages: [] },
   { id: "prod-choya", q: "Choya The Kishu umeshu bottle plum", pages: [] },

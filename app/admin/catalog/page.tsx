@@ -73,13 +73,13 @@ function Editor({ product, trips, onSave, onClose }: { product: CatalogProduct; 
           <div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-extrabold">Product</h2><button onClick={onClose}><Icon name="x" size={20} className="text-faint" /></button></div>
           <div className="flex flex-col gap-3 text-sm">
             <Text label="Name" value={p.name} onChange={(v) => set("name", v)} />
-            <label className="font-bold text-muted">Description<textarea value={p.description} onChange={(e) => set("description", e.target.value)} className="mt-1 w-full rounded-lg border border-black/15 p-2 text-ink" rows={2} /></label>
+            <label className="font-bold text-muted">Description<textarea value={p.description} onChange={(e) => set("description", e.target.value)} className="mt-1 w-full rounded-lg border border-edge/15 p-2 text-ink" rows={2} /></label>
             <div className="grid grid-cols-2 gap-3">
               <Num label="Base price (foreign)" value={p.base_price_foreign} onChange={(v) => set("base_price_foreign", v)} />
               <Num label="Markup %" value={p.markup_percentage} onChange={(v) => set("markup_percentage", v)} />
               <Num label="Flat fee (IDR)" value={p.flat_jastip_fee} onChange={(v) => set("flat_jastip_fee", v)} />
               <label className="font-bold text-muted">Trip
-                <select value={p.trip_id} onChange={(e) => set("trip_id", e.target.value)} className="mt-1 h-10 w-full rounded-lg border border-black/15 px-2 text-ink">
+                <select value={p.trip_id} onChange={(e) => set("trip_id", e.target.value)} className="mt-1 h-10 w-full rounded-lg border border-edge/15 px-2 text-ink">
                   {trips.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
               </label>
@@ -98,8 +98,8 @@ function Editor({ product, trips, onSave, onClose }: { product: CatalogProduct; 
   );
 }
 function Text({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
-  return <label className="font-bold text-muted">{label}<input value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 h-10 w-full rounded-lg border border-black/15 px-3 text-ink" /></label>;
+  return <label className="font-bold text-muted">{label}<input value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 h-10 w-full rounded-lg border border-edge/15 px-3 text-ink" /></label>;
 }
 function Num({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
-  return <label className="font-bold text-muted">{label}<input type="number" value={value} onChange={(e) => onChange(Number(e.target.value))} className="mt-1 h-10 w-full rounded-lg border border-black/15 px-3 text-ink" /></label>;
+  return <label className="font-bold text-muted">{label}<input type="number" value={value} onChange={(e) => onChange(Number(e.target.value))} className="mt-1 h-10 w-full rounded-lg border border-edge/15 px-3 text-ink" /></label>;
 }

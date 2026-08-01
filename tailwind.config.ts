@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -16,10 +17,12 @@ const config: Config = {
           600: "#2563EB",
           700: "#1D4ED8"
         },
-        ink: "#1c1917",
-        muted: "#57534e",
-        faint: "#78716c",
-        cream: "#faf9f7",
+        ink: "rgb(var(--ink) / <alpha-value>)",
+        muted: "rgb(var(--muted) / <alpha-value>)",
+        faint: "rgb(var(--faint) / <alpha-value>)",
+        cream: "rgb(var(--cream) / <alpha-value>)",
+        surface: "rgb(var(--surface) / <alpha-value>)",
+        edge: "rgb(var(--edge) / <alpha-value>)",
         // --- Luxury theme (onyx + gold) ---
         onyx: {
           DEFAULT: "#0A0A0A",

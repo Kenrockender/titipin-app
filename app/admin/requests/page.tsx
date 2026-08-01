@@ -81,7 +81,7 @@ function QuoteTool({ onQuote, rate, pricing, qty }: { onQuote: (p: number, dp: n
         <div className="my-1 border-t border-brand-100" />
         <div className="flex justify-between font-extrabold text-brand-700"><span>Quote total</span><span>{formatIDR(q.totalIdr)}</span></div>
         <div className="mt-2 mb-1 flex gap-1">
-          {[0.5, 0.6, 0.7].map((rr) => <button key={rr} onClick={() => setDpRatio(rr)} className={`flex-1 rounded py-1 text-xs font-bold ${dpRatio === rr ? "bg-brand text-white" : "bg-white text-brand-700"}`}>{rr * 100}% DP</button>)}
+          {[0.5, 0.6, 0.7].map((rr) => <button key={rr} onClick={() => setDpRatio(rr)} className={`flex-1 rounded py-1 text-xs font-bold ${dpRatio === rr ? "bg-brand text-white" : "bg-surface text-brand-700"}`}>{rr * 100}% DP</button>)}
         </div>
         <div className="flex justify-between font-bold"><span>Required DP</span><span>{formatIDR(dp)}</span></div>
         <Button className="mt-3 w-full h-10" disabled={base <= 0} onClick={() => onQuote(q.totalIdr, dp)}>Send Quote to Customer</Button>
@@ -92,7 +92,7 @@ function QuoteTool({ onQuote, rate, pricing, qty }: { onQuote: (p: number, dp: n
 function NumField({ label, value, onChange, disabled }: { label: string; value: number; onChange: (n: number) => void; disabled?: boolean }) {
   return (
     <label className="text-xs font-bold text-muted">{label}
-      <input type="number" value={value} disabled={disabled} onChange={(e) => onChange(Number(e.target.value))} className="mt-1 h-9 w-full rounded-lg border border-black/15 bg-white px-2 text-sm text-ink disabled:opacity-60" />
+      <input type="number" value={value} disabled={disabled} onChange={(e) => onChange(Number(e.target.value))} className="mt-1 h-9 w-full rounded-lg border border-edge/15 bg-surface px-2 text-sm text-ink disabled:opacity-60" />
     </label>
   );
 }

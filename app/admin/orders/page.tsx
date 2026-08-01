@@ -29,14 +29,14 @@ export default function AdminOrders() {
             <button className="flex w-full items-center gap-4 text-left" onClick={() => setOpen(open === o.id ? null : o.id)}>
               <div className="flex -space-x-3">
                 {o.items.slice(0, 3).map((it) => /* eslint-disable-next-line @next/next/no-img-element */ (
-                  <img key={it.id} src={it.image_url} alt="" className="h-10 w-10 rounded-lg border-2 border-white object-cover" />
+                  <img key={it.id} src={it.image_url} alt="" className="h-10 w-10 rounded-lg border-2 border-surface object-cover" />
                 ))}
               </div>
               <div className="flex-1">
                 <div className="font-bold">#{shortId(o.id)} · {o.items.length} item(s)</div>
                 <div className="text-xs text-muted">{o.customer_name} · {formatDate(o.created_at)}</div>
               </div>
-              <span className={`hidden rounded-full px-2.5 py-1 text-[11px] font-bold sm:inline-block ${o.delivery_method === "GoSend" ? "bg-blue-50 text-blue-700" : "bg-black/[.05] text-muted"}`}>
+              <span className={`hidden rounded-full px-2.5 py-1 text-[11px] font-bold sm:inline-block ${o.delivery_method === "GoSend" ? "bg-blue-50 text-blue-700" : "bg-edge/[.05] text-muted"}`}>
                 {o.delivery_method === "GoSend" ? "GoSend" : "Pickup"}
               </span>
               <StatusBadge status={o.status} />
@@ -44,7 +44,7 @@ export default function AdminOrders() {
               <Icon name={open === o.id ? "chevron-up" : "chevron-down"} size={18} className="text-faint" />
             </button>
             {open === o.id && (
-              <div className="mt-4 border-t border-black/[.06] pt-4">
+              <div className="mt-4 border-t border-edge/[.06] pt-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <div className="mb-2 text-sm font-bold">Line items</div>

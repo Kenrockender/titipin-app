@@ -1,7 +1,6 @@
 -- Optional demo seed (mirrors lib/mock-data.ts).
 insert into trips (name, destination_country, system_exchange_rate, status) values
-  ('Tokyo Trip — Aug 2026', 'Japan', 112, 'Active Shopping'),
-  ('Seoul Trip — Oct 2026', 'South Korea', 12.1, 'Planning');
+  ('Tokyo Trip — Aug 2026', 'Japan', 112, 'Active Shopping');
 
 insert into add_ons (name, price_idr) values
   ('Extra Thick Bubble Wrap', 15000),

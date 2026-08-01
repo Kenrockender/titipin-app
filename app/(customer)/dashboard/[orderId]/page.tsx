@@ -50,14 +50,14 @@ export default function OrderDetail() {
       {/* Timeline */}
       <Card className="mb-5 overflow-x-auto p-5">
         <div className="relative flex min-w-[560px] items-start justify-between">
-          <div className="absolute left-0 right-0 top-3.5 h-0.5 -translate-y-1/2 bg-black/[.08]" />
+          <div className="absolute left-0 right-0 top-3.5 h-0.5 -translate-y-1/2 bg-edge/[.08]" />
           <div
             className="absolute left-0 top-3.5 h-0.5 -translate-y-1/2 bg-brand transition-all"
             style={{ width: `${(stepIdx / (TIMELINE.length - 1)) * 100}%` }}
           />
           {TIMELINE.map((step, i) => (
             <div key={step} className="relative z-10 flex w-0 flex-1 flex-col items-center gap-1.5">
-              <span className={`flex h-7 w-7 flex-none items-center justify-center rounded-full text-xs font-bold ${i <= stepIdx ? "bg-brand text-white" : "bg-black/[.07] text-faint"}`}>{i < stepIdx ? "✓" : i + 1}</span>
+              <span className={`flex h-7 w-7 flex-none items-center justify-center rounded-full text-xs font-bold ${i <= stepIdx ? "bg-brand text-white" : "bg-gray-100 text-faint dark:bg-neutral-800"}`}>{i < stepIdx ? "✓" : i + 1}</span>
               <span className={`text-center text-[11px] font-semibold leading-tight ${i <= stepIdx ? "text-ink" : "text-faint"}`}>{step}</span>
             </div>
           ))}
@@ -102,7 +102,7 @@ export default function OrderDetail() {
         <Row label="Down payment" value={formatIDR(order.total_dp_required_idr)} />
         <Row label="Delivery" value={order.delivery_method === "GoSend" ? "GoSend" : "Ambil Sendiri (Pickup)"} />
         {order.local_shipping_fee_idr != null && <Row label="Local shipping" value={formatIDR(order.local_shipping_fee_idr)} />}
-        <div className="my-2 border-t border-black/10" />
+        <div className="my-2 border-t border-edge/10" />
         {(needsDP || needsFinal) && (
           <div className="rounded-xl bg-brand-50 p-4">
             <div className="mb-1 flex items-center justify-between">
@@ -110,7 +110,7 @@ export default function OrderDetail() {
               <span className="text-lg font-extrabold text-brand-700">{formatIDR(needsDP ? order.total_dp_required_idr : finalBalance)}</span>
             </div>
             <p className="mb-3 text-xs text-muted">Transfer to <b>{BANK_ACCOUNT_INFO}</b> or scan QRIS, then upload your receipt.</p>
-            <label className="mb-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brand/40 py-4 text-sm font-semibold text-brand-700 hover:bg-white">
+            <label className="mb-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brand/40 py-4 text-sm font-semibold text-brand-700 hover:bg-surface">
               <Icon name="upload" size={16} /> {receipt ? "Receipt attached ✓" : "Upload transfer receipt"}
               <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onload = () => setReceipt(r.result as string); r.readAsDataURL(f); } }} />
             </label>

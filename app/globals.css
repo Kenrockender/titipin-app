@@ -6,9 +6,24 @@
   --brand: #2563EB;
   --font-jakarta: "Plus Jakarta Sans", system-ui, sans-serif;
   --font-cormorant: "Cormorant Garamond", Georgia, serif;
+
+  --ink: 28 25 23;      /* #1c1917 */
+  --muted: 87 83 78;    /* #57534e */
+  --faint: 120 113 108; /* #78716c */
+  --cream: 250 249 247; /* #faf9f7 */
+  --surface: 255 255 255; /* white cards */
+  --edge: 0 0 0;        /* border/divider tint, paired with low alpha */
+}
+:root.dark {
+  --ink: 245 245 244;      /* #f5f5f4 */
+  --muted: 168 162 158;    /* #a8a29e */
+  --faint: 120 113 108;    /* #78716c */
+  --cream: 12 12 13;       /* page background */
+  --surface: 24 24 26;     /* card background */
+  --edge: 255 255 255;     /* border/divider tint on dark bg */
 }
 html { -webkit-font-smoothing: antialiased; }
-body { background: #faf9f7; color: #1c1917; font-family: var(--font-jakarta); }
+body { background: rgb(var(--cream)); color: rgb(var(--ink)); font-family: var(--font-jakarta); transition: background-color .15s ease, color .15s ease; }
 ::selection { background: #DBEAFE; }
 
 /* Luxury section: gold selection + thin gold scrollbar on dark bg */

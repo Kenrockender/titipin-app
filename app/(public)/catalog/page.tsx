@@ -16,7 +16,7 @@ export default function CatalogPage() {
       <div className="mb-6 flex flex-wrap gap-2">
         {cats.map((c) => (
           <button key={c} onClick={() => setCat(c)}
-            className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${cat === c ? "bg-brand text-white" : "bg-white text-muted border border-black/10 hover:border-ink"}`}>{c}</button>
+            className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${cat === c ? "bg-brand text-white" : "bg-surface text-muted border border-edge/10 hover:border-ink"}`}>{c}</button>
         ))}
       </div>
       <ProductGrid products={list} />

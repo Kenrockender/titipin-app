@@ -36,7 +36,7 @@ export default function DashboardPage() {
               <div className="flex -space-x-3">
                 {o.items.slice(0, 3).map((it) => (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img key={it.id} src={it.image_url} alt="" className="h-11 w-11 rounded-lg border-2 border-white object-cover" />
+                  <img key={it.id} src={it.image_url} alt="" className="h-11 w-11 rounded-lg border-2 border-surface object-cover" />
                 ))}
               </div>
               <div className="flex-1">

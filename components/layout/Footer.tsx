@@ -8,7 +8,7 @@ export function Footer() {
   const path = usePathname();
   if (path.startsWith("/admin")) return null;
   return (
-    <footer className="mt-16 border-t border-black/[.07] bg-white">
+    <footer className="mt-16 border-t border-edge/[.07] bg-surface">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 md:grid-cols-3">
         <div>
           <div className="flex items-center gap-2.5">
@@ -34,7 +34,7 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-black/[.06] py-5 text-center text-xs text-faint">© 2026 Titipin · Jasa Titip Platform</div>
+      <div className="border-t border-edge/[.06] py-5 text-center text-xs text-faint">© 2026 Titipin · Jasa Titip Platform</div>
     </footer>
   );
 }

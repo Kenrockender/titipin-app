@@ -51,7 +51,7 @@ export default function LandingPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="border-y border-black/[.06] bg-white">
+      <section className="border-y border-edge/[.06] bg-surface">
         <div className="mx-auto grid max-w-6xl gap-6 px-5 py-12 md:grid-cols-4">
           {[
             { icon: "search", t: "1. Browse or Request", d: "Pick from the catalog or drop a link/photo of what you want." },
@@ -81,7 +81,7 @@ export default function LandingPage() {
       </section>
 
       {/* RECENT HAULS */}
-      <section className="border-t border-black/[.06] bg-white">
+      <section className="border-t border-edge/[.06] bg-surface">
         <div className="mx-auto max-w-6xl px-5 py-14">
           <h2 className="text-2xl font-extrabold tracking-tight">Recent Hauls</h2>
           <p className="mb-6 text-sm text-muted">Real packed boxes and delivered items from past trips.</p>
@@ -99,7 +99,7 @@ export default function LandingPage() {
         <div className="flex flex-col items-center gap-4 rounded-3xl bg-brand px-6 py-14 text-center text-white">
           <h2 className="max-w-xl text-3xl font-extrabold tracking-tight">Can&apos;t find it? We&apos;ll hunt it down.</h2>
           <p className="max-w-md text-white/90">Paste a link or upload a screenshot. We&apos;ll send you a transparent quote within hours.</p>
-          <Link href="/request"><Button variant="outline" className="h-12 border-white bg-white px-7 text-brand-700">Request an Item</Button></Link>
+          <Link href="/request"><Button variant="outline" className="h-12 border-surface bg-surface px-7 text-brand-700">Request an Item</Button></Link>
         </div>
       </section>
     </main>

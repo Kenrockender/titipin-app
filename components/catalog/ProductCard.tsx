@@ -12,8 +12,8 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
   const { addToCart, decrementCartItem, cart } = useStore();
   const qty = cart.find((l) => l.product.id === product.id)?.quantity ?? 0;
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-black/[.07] bg-white shadow-card">
-      <Link href={`/catalog/${product.id}`} className="relative block aspect-square overflow-hidden bg-black/[.04]">
+    <div className="group flex flex-col overflow-hidden rounded-2xl border border-edge/[.07] bg-surface shadow-card">
+      <Link href={`/catalog/${product.id}`} className="relative block aspect-square overflow-hidden bg-edge/[.04]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={product.image_url} alt={product.name} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/products/_placeholder.svg"; }} />
         {product.category && <span className="absolute left-3 top-3"><Badge tone="brand">{product.category}</Badge></span>}
@@ -31,7 +31,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
                 key={cv.product_id}
                 href={`/catalog/${cv.product_id}`}
                 title={cv.color_name}
-                className={`block h-4 w-4 rounded-full border transition-transform hover:scale-125 ${cv.product_id === product.id ? 'ring-2 ring-brand ring-offset-1 border-brand' : 'border-black/20 hover:border-black/40'}`}
+                className={`block h-4 w-4 rounded-full border transition-transform hover:scale-125 ${cv.product_id === product.id ? 'ring-2 ring-brand ring-offset-1 border-brand' : 'border-edge/20 hover:border-edge/40'}`}
                 style={{ backgroundColor: cv.hex }}
               />
             ))}
@@ -51,7 +51,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
               <button
                 onClick={() => decrementCartItem(product.id)}
                 aria-label="Decrease quantity"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-lg font-bold text-brand-700 hover:bg-white"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-lg font-bold text-brand-700 hover:bg-surface"
               >
                 −
               </button>
@@ -59,7 +59,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
               <button
                 onClick={() => addToCart(product)}
                 aria-label="Increase quantity"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-lg font-bold text-brand-700 hover:bg-white"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-lg font-bold text-brand-700 hover:bg-surface"
               >
                 +
               </button>

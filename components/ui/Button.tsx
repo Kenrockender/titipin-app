@@ -4,10 +4,10 @@ import React from "react";
 type Variant = "primary" | "outline" | "ghost" | "danger" | "subtle";
 const styles: Record<Variant, string> = {
   primary: "bg-brand text-white hover:brightness-95 shadow-sm",
-  outline: "bg-white text-ink border border-black/15 hover:border-ink",
-  ghost: "bg-transparent text-ink hover:bg-black/5",
+  outline: "bg-surface text-ink border border-edge/15 hover:border-ink",
+  ghost: "bg-transparent text-ink hover:bg-edge/5",
   danger: "bg-red-600 text-white hover:brightness-95",
-  subtle: "bg-brand-50 text-brand-700 hover:bg-brand-100"
+  subtle: "bg-brand-50 text-brand-700 hover:bg-brand-100 dark:bg-brand/15 dark:text-blue-300 dark:hover:bg-brand/25"
 };
 
 export function Button({

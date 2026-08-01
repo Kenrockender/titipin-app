@@ -54,6 +54,7 @@ interface StoreActions {
   upsertProduct: (p: CatalogProduct) => void;
   toggleProductActive: (id: string) => void;
   updatePricing: (p: PricingConfig) => void;
+  updateTripRate: (tripId: string, rate: number) => void;
 }
 
 const Ctx = createContext<(StoreState & StoreActions) | null>(null);
@@ -71,6 +72,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
+  const [trips, setTrips] = useState<Trip[]>(seed.trips);
   const [products, setProducts] = useState<CatalogProduct[]>(seed.products);
   const [requests, setRequests] = useState<CustomRequest[]>(seed.requests);
   const [orders, setOrders] = useState<Order[]>(seed.orders);
@@ -276,16 +278,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setProducts((ps) => ps.map((p) => p.id === id ? { ...p, is_active: !p.is_active } : p));
   }, []);
   const updatePricing = useCallback((p: PricingConfig) => setPricing(p), []);
+  const updateTripRate = useCallback((tripId: string, rate: number) => {
+    setTrips((ts) => ts.map((t) => t.id === tripId ? { ...t, system_exchange_rate: rate } : t));
+  }, []);
 
   const value = useMemo(() => ({
-    currentUser, isAdmin, authLoading, trips: seed.trips, products, requests, orders, addOns: seed.addOns, pricing, cart, hauls: seed.hauls, heroHauls: seed.heroHauls,
+    currentUser, isAdmin, authLoading, trips, products, requests, orders, addOns: seed.addOns, pricing, cart, hauls: seed.hauls, heroHauls: seed.heroHauls,
     signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, decrementCartItem, clearCart, submitRequest,
     placeOrder, markPayment, quoteRequest, setRequestStatus, setItemStatus, setOrderStatus,
-    refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing
-  }), [currentUser, isAdmin, authLoading, products, requests, orders, pricing, cart,
+    refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing, updateTripRate
+  }), [currentUser, isAdmin, authLoading, trips, products, requests, orders, pricing, cart,
     signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, decrementCartItem, clearCart, submitRequest,
     placeOrder, markPayment, quoteRequest, setRequestStatus, setItemStatus, setOrderStatus,
-    refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing]);
+    refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing, updateTripRate]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

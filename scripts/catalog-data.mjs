@@ -43,12 +43,6 @@ export const BASES = [
   { id: "donbei", n: "Nissin Donbei Kitsune Udon (3 pk)", d: "The fluffy fried-tofu udon that airport shops can't keep stocked.", c: "Snacks", s: "Don Quijote Shinjuku", t: "tokyo", p: 645 },
   { id: "peyoung", n: "Peyoung Yakisoba GIGAMAX", d: "2,142 kcal of instant yakisoba. A challenge, not a meal.", c: "Snacks", s: "Don Quijote Shinjuku", t: "tokyo", p: 300 },
   { id: "popin-cookin", n: "Popin' Cookin' DIY Candy Kit", d: "Make-your-own candy chemistry sets — weirdly satisfying.", c: "Snacks", s: "Don Quijote Shinjuku", t: "tokyo", p: 320, vq: 1, v: ["Sushi Set", "Bento Set", "Donuts Set"] },
-  { id: "honeybutter", n: "Honey Butter Almond", d: "Korea's airport-clearing almond snack.", c: "Snacks", s: "Emart Seoul", t: "seoul", p: 6980, vq: 1, v: ["Original", "Wasabi", "Injeolmi"] },
-  { id: "turtlechips", n: "Orion Turtle Chips", d: "Quadruple-layered chips in Korea-only flavors.", c: "Snacks", s: "Emart Seoul", t: "seoul", p: 3480, vq: 1, v: ["Corn Soup", "Choco Churro"] },
-  { id: "marketo", n: "Market O Real Brownie (8 pcs)", d: "Dense chocolate brownies, Korea's classic gift snack.", c: "Snacks", s: "Emart Seoul", t: "seoul", p: 5400 },
-  { id: "butterwaffle", n: "Crown Butter Waffle", d: "Thin crispy butter waffles — Korean tea-time staple.", c: "Snacks", s: "Emart Seoul", t: "seoul", p: 3200 },
-  { id: "pepero-premium", n: "Lotte Pepero Premium", d: "Korea's Pocky rival in premium editions.", c: "Snacks", s: "Emart Seoul", t: "seoul", p: 2800, vq: 1, v: ["Nude", "Almond"] },
-  { id: "binch", n: "Lotte Binch Biscuits", d: "Half-chocolate half-biscuit elegance from Korea.", c: "Snacks", s: "Emart Seoul", t: "seoul", p: 3400 },
 
   // ================= BEVERAGES =================
   { id: "dassai-var", n: "Dassai Junmai Daiginjo", d: "Japan's most celebrated sake brewery, higher polish grades.", c: "Beverages", s: "Isetan Liquor", t: "tokyo", p: 2530, f: 70000, vq: 1, v: [{ n: "39 (720ml)" }, { n: "23 (720ml)", p: 5720 }] },
@@ -83,12 +77,6 @@ export const BASES = [
   { id: "yakult1000", n: "Yakult 1000 (7 pk)", d: "The viral sleep-better Yakult, Japan exclusive.", c: "Beverages", s: "FamilyMart", t: "tokyo", p: 910 },
   { id: "pocari-powder", n: "Pocari Sweat Powder (10 pk)", d: "Make Pocari anywhere — hoarder favorite.", c: "Beverages", s: "Matsumoto Kiyoshi", t: "tokyo", p: 1080 },
   { id: "japan-soda-set", n: "Japan-Only Soda Set (8 cans)", d: "Seasonal Fanta, Pepsi and oddball sodas in one box.", c: "Beverages", s: "Don Quijote Shinjuku", t: "tokyo", p: 1400, f: 50000 },
-  { id: "jinro-soju", n: "Jinro Flavored Soju", d: "Korea's favorite fruit sojus, fresher at the source.", c: "Beverages", s: "Emart Seoul", t: "seoul", p: 1900, f: 60000, vq: 1, v: ["Green Grape", "Strawberry", "Plum"] },
-  { id: "bokbunja", n: "Bohae Bokbunja 375ml", d: "Korean black raspberry wine, sweet and moreish.", c: "Beverages", s: "Emart Seoul", t: "seoul", p: 8900, f: 60000 },
-  { id: "vita500", n: "Kwangdong Vita500 (10 btl)", d: "Korea's vitamin-C energy shot in the yellow bottle.", c: "Beverages", s: "Emart Seoul", t: "seoul", p: 7500 },
-  { id: "bananamilk", n: "Binggrae Banana Milk (6 pk)", d: "The chubby-bottle banana milk of every K-drama.", c: "Beverages", s: "GS25 Seoul", t: "seoul", p: 9000 },
-  { id: "maxim", n: "Maxim Mocha Gold (100 sticks)", d: "Korea's office coffee, hoarded by the boxful.", c: "Beverages", s: "Emart Seoul", t: "seoul", p: 19800 },
-  { id: "osulloc", n: "Osulloc Tea Gift Set", d: "Jeju island tea in Korea's most giftable packaging.", c: "Beverages", s: "Osulloc Myeongdong", t: "seoul", p: 24000, vq: 1, v: ["Sejak", "Honey Pearl"] },
 
   // ================= SKINCARE & BEAUTY =================
   { id: "hadalabo-var", n: "Hada Labo Gokujyun", d: "More of the hyaluronic family everyone repurchases.", c: "Skincare", s: "Matsumoto Kiyoshi", t: "tokyo", p: 1200, vq: 1, v: ["Premium Lotion", "Light Lotion", "Milk"] },
@@ -116,27 +104,6 @@ export const BASES = [
   { id: "shigaisen", n: "Shigaisen Yohou UV Stick", d: "Clear sunscreen stick for lazy reapplication.", c: "Skincare", s: "Ainz & Tulpe", t: "tokyo", p: 2860 },
   { id: "ettusais", n: "Ettusais Lip Essence Stick", d: "Night lip treatment with a devoted Japan fanbase.", c: "Skincare", s: "Ainz & Tulpe", t: "tokyo", p: 1320 },
   { id: "keana", n: "Keana Nadeshiko Rice Mask (10 pk)", d: "Rice-serum pore masks, permanently trending.", c: "Skincare", s: "Matsumoto Kiyoshi", t: "tokyo", p: 715 },
-  { id: "medicube-var", n: "Medicube", d: "More from the glass-skin brand.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 26000, vq: 1, v: ["Zero Pore Pads 2.0", "Collagen Jelly Cream", "Deep Vita C Capsule Cream"] },
-  { id: "anua-var", n: "Anua Heartleaf", d: "The heartleaf line beyond the famous oil.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 18000, vq: 1, v: ["77% Soothing Toner", "Niacinamide Serum", "Pore Control Foam"] },
-  { id: "cosrx", n: "COSRX Essentials", d: "K-beauty's no-nonsense workhorses.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 17000, vq: 1, v: ["Snail 96 Essence", "Low pH Cleanser", "Vitamin C 23 Serum"] },
-  { id: "boj", n: "Beauty of Joseon", d: "Hanbang skincare that conquered TikTok.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 15000, vq: 1, v: ["Relief Sun SPF50", "Glow Serum", "Ginseng Cleansing Oil"] },
-  { id: "torriden", n: "Torriden Dive-In", d: "Korea's minimalist hydration line.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 16000, vq: 1, v: ["Serum", "Toner"] },
-  { id: "roundlab", n: "Round Lab", d: "Olive Young bestseller shelf regulars.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 16000, vq: 1, v: ["1025 Dokdo Toner", "Birch Juice Sunscreen"] },
-  { id: "skin1004", n: "Skin1004 Centella", d: "Madagascar centella for angry skin.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 15500, vq: 1, v: ["Ampoule", "Hyalu-Cica Sun Serum"] },
-  { id: "mixsoon", n: "Mixsoon Bean Essence 50ml", d: "The fermented bean essence with a chokehold on K-beauty.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 22000 },
-  { id: "abib", n: "Abib Gummy Sheet Mask (10 pk)", d: "The jelly-adhesion masks that hug your face.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 27000 },
-  { id: "mediheal", n: "Mediheal Mask Box (10 pk)", d: "Korea's pharmacy mask in bulk boxes.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 12000, vq: 1, v: ["Tea Tree", "Collagen", "Madecassoside"] },
-  { id: "numbuzin", n: "Numbuzin Serum", d: "The numbered serums Koreans rank religiously.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 21000, vq: 1, v: ["No.3 Glow", "No.5 Vitamin"] },
-  { id: "goodal", n: "Goodal Green Tangerine Vita C Serum", d: "Jeju tangerine brightening, gentle enough for daily use.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 18000 },
-  { id: "isntree", n: "Isntree Hyaluronic Toner 400ml", d: "A liter-adjacent bottle of pure hydration.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 19000 },
-  { id: "manyo", n: "Ma:nyo Pure Cleansing Oil 200ml", d: "Korea's #1 cleansing oil by units sold.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 19500 },
-  { id: "laneige-var", n: "Laneige", d: "More Laneige icons at Korea prices.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 25000, vq: 1, v: ["Water Bank Cream", "Cream Skin Toner", "Bouncy & Firm Sleeping Mask"] },
-  { id: "sulwhasoo", n: "Sulwhasoo First Care Serum 60ml", d: "Korea's luxury hanbang serum, duty-free darling.", c: "Skincare", s: "Lotte Duty Free", t: "seoul", p: 76000, mk: 18 },
-  { id: "hera-cushion", n: "Hera Black Cushion", d: "The K-drama cushion foundation.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 40000 },
-  { id: "drjart", n: "Dr.Jart+ Cicapair", d: "Green-to-beige redness rescue.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 28000, vq: 1, v: ["Tiger Grass Cream", "Color Correcting Treatment"] },
-  { id: "rom-nd", n: "Rom&nd Juicy Lasting Tint", d: "The glassy K-lip tint in bestseller shades.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 9900, vq: 1, v: ["Fig Fig", "Apple Brown", "Bare Grape"] },
-  { id: "clio-kill", n: "Clio Kill Cover Cushion", d: "Korea's full-coverage cushion king.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 22000 },
-  { id: "tirtir", n: "TirTir Mask Fit Red Cushion", d: "The viral red cushion in 40 shades.", c: "Skincare", s: "Olive Young Myeongdong", t: "seoul", p: 24000 },
 
   // ================= FRAGRANCE =================
   { id: "shiro-var", n: "SHIRO Eau de Parfum 40ml", d: "SHIRO's clean-scent lineup beyond Savon.", c: "Fragrance", s: "SHIRO Aoyama", t: "tokyo", p: 5280, vq: 1, v: ["White Tea", "Kinmokusei", "Earl Grey", "Sabon Iris"] },
@@ -149,10 +116,6 @@ export const BASES = [
   { id: "diser", n: "DI SER Eau de Parfum 30ml", d: "Sapporo's all-botanical niche house.", c: "Fragrance", s: "Nose Shop Shinjuku", t: "tokyo", p: 13200, mk: 20, vq: 1, v: ["Kyara", "Sora"] },
   { id: "isseyleau", n: "Issey Miyake L'Eau d'Issey 50ml", d: "The Japanese design-classic scent, home pricing.", c: "Fragrance", s: "Isetan Shinjuku", t: "tokyo", p: 8800, vq: 1, v: ["Pour Homme", "Pour Femme"] },
   { id: "uka-nail", n: "Uka Nail Oil", d: "Tokyo salon's scented nail oils, perfect small gift.", c: "Fragrance", s: "Uka Tokyo Midtown", t: "tokyo", p: 3630, vq: 1, v: ["7:15", "24:45"] },
-  { id: "tamburins-var", n: "Tamburins", d: "Seoul's gallery-like scent brand.", c: "Fragrance", s: "Tamburins Hannam Seoul", t: "seoul", p: 42000, vq: 1, v: ["Egg Perfume Chamo", "Perfume Balm Pumkini", "Hand Cream 000", "Big Hand Cream Berga Sandal"] },
-  { id: "nonfiction", n: "Nonfiction Eau de Parfum 100ml", d: "Korea's minimalist luxury scent house.", c: "Fragrance", s: "Nonfiction Hannam", t: "seoul", p: 135000, mk: 20, vq: 1, v: ["Santal Cream", "Gentle Night", "For Rest"] },
-  { id: "granhand", n: "Granhand Multi Perfume 100ml", d: "Seoul's beloved paper-wrapped fragrance shop.", c: "Fragrance", s: "Granhand Bukchon", t: "seoul", p: 38000, vq: 1, v: ["Roland", "Marine Orchid", "Troublesome"] },
-  { id: "forment", n: "Forment Cotton Perfume 50ml", d: "The 'fabric softener' scent all of Korea wears.", c: "Fragrance", s: "Olive Young Myeongdong", t: "seoul", p: 39000, vq: 1, v: ["Cotton Hug", "Cotton Kiss"] },
 
   // ================= FASHION =================
   { id: "uniqlo-airism", n: "Uniqlo Airism Cotton Tee", d: "The invisible-comfort tee Japan buys in bulk.", c: "Fashion", s: "Uniqlo Ginza", t: "tokyo", p: 1500, vq: 1, v: ["White", "Black", "Olive"] },
@@ -176,13 +139,6 @@ export const BASES = [
   { id: "gramicci", n: "Gramicci Climbing Pant", d: "The gusseted everyday pants Japan standardized.", c: "Fashion", s: "BEAMS Harajuku", t: "tokyo", p: 8800, vq: 1, v: ["Olive", "Black", "Beige", "Navy"] },
   { id: "tabio", n: "Tabio Japanese Socks", d: "Japan's finest sock maker, ridiculous quality.", c: "Fashion", s: "Tabio Shibuya", t: "tokyo", p: 1430, mk: 30, vq: 1, v: ["Ribbed Wool", "Tabi Split-Toe", "Pile Room Socks"] },
   { id: "muji-basics", n: "MUJI Wardrobe Basics", d: "The quiet essentials MUJI does best.", c: "Fashion", s: "MUJI Ginza", t: "tokyo", p: 2990, vq: 1, v: ["Oxford Shirt", "Sweatshirt", "Linen Shirt"] },
-  { id: "aderror", n: "Ader Error Logo Piece", d: "Seoul's art-school streetwear darling.", c: "Fashion", s: "Ader Error Seongsu", t: "seoul", p: 98000, mk: 22, vq: 1, v: ["Tee", "Beanie"] },
-  { id: "matinkim", n: "Matin Kim", d: "The it-girl Seoul brand with permanent queues.", c: "Fashion", s: "Matin Kim Hannam", t: "seoul", p: 59000, mk: 25, vq: 1, v: ["Logo Tee", "Ball Cap", "Mini Bag", "Knit Zip-Up"] },
-  { id: "mardi", n: "Mardi Mercredi Flower Tee", d: "Korea's flower-logo phenomenon, jastip bestseller.", c: "Fashion", s: "Mardi Mercredi Apgujeong", t: "seoul", p: 49000, mk: 25, vq: 1, v: ["White/Navy", "Cream/Red", "Black/White", "Sweatshirt Ivory"] },
-  { id: "covernat", n: "Covernat Authentic Logo", d: "Clean Korean casual with wallet-friendly prices.", c: "Fashion", s: "Covernat Hongdae", t: "seoul", p: 39000, vq: 1, v: ["Tee", "Hoodie"] },
-  { id: "thisisneverthat", n: "Thisisneverthat T-Logo", d: "Seoul streetwear in its natural habitat.", c: "Fashion", s: "Thisisneverthat Hannam", t: "seoul", p: 42000, vq: 1, v: ["Tee", "Cap", "Crewneck"] },
-  { id: "emis", n: "EMIS New Logo Ball Cap", d: "The K-celeb cap brand, always low stock.", c: "Fashion", s: "EMIS Hannam", t: "seoul", p: 42000, mk: 25, vq: 1, v: ["Beige", "Black", "Pink"] },
-  { id: "mlb-korea", n: "MLB Korea Cap", d: "The Korea-only MLB fashion line, NY monogram era.", c: "Fashion", s: "MLB Myeongdong", t: "seoul", p: 39000, vq: 1, v: ["NY Black", "NY Beige", "LA Cream"] },
 
   // ================= SHOES =================
   { id: "mexico66-var", n: "Onitsuka Tiger Mexico 66", d: "The Kill Bill classic in Japan-exclusive colorways.", c: "Shoes", s: "Onitsuka Tiger Ginza", t: "tokyo", p: 15400, vq: 1, colors: [{n:"Yellow/Black",h:"#F5D30F"},{n:"White/Blue",h:"#4A90D9"},{n:"Birch/Green",h:"#6B8E4E"},{n:"Black/White",h:"#1A1A1A"},{n:"Silver/Red",h:"#C0392B"},{n:"Cream/Peacoat",h:"#2C3E50"}], v: ["Yellow/Black", "White/Blue", "Birch/Green", "Black/White", "Silver/Red", "Cream/Peacoat"] },
@@ -200,7 +156,6 @@ export const BASES = [
   { id: "converse-onestar", n: "Converse Japan One Star J", d: "Suede one-star, Japan-license exclusive.", c: "Shoes", s: "Billy's Tokyo", t: "tokyo", p: 14300, vq: 1, colors: [{n:"Black",h:"#1A1A1A"},{n:"Navy",h:"#2C3E50"}], v: ["Black", "Navy"] },
   { id: "moonstar", n: "Moonstar 810s", d: "Kurume-made rubber shoes, quiet design-lover hit.", c: "Shoes", s: "1LDK Nakameguro", t: "tokyo", p: 7700, vq: 1, colors: [{n:"Kitchen White",h:"#FFFFFF"},{n:"Marke Black",h:"#1A1A1A"},{n:"Hospi Grey",h:"#A0A0A0"}], v: ["Kitchen White", "Marke Black", "Hospi Grey"] },
   { id: "mizuno-racer", n: "Mizuno Wave Rider 10 OG", d: "Japan's own runner heritage, reissued.", c: "Shoes", s: "ABC Mart Harajuku", t: "tokyo", p: 14300, vq: 1, colors: [{n:"Silver/Blue",h:"#4A90D9"},{n:"White/Red",h:"#C0392B"}], v: ["Silver/Blue", "White/Red"] },
-  { id: "excelsior", n: "Excelsior Bolt Sneaker", d: "Korea's canvas-sneaker answer to Converse.", c: "Shoes", s: "Excelsior Hongdae", t: "seoul", p: 69000, vq: 1, colors: [{n:"Ecru",h:"#F5F0E1"},{n:"Black",h:"#1A1A1A"},{n:"Mustard",h:"#E1A95F"}], v: ["Ecru", "Black", "Mustard"] },
 
   // ================= ELECTRONICS =================
   { id: "x100vi-silver", n: "Fujifilm X100VI (Silver)", d: "The silver version of the sold-out icon.", c: "Electronics", s: "Bic Camera Shinjuku", t: "tokyo", p: 280000, mk: 12, f: 150000 },
@@ -271,7 +226,6 @@ export const BASES = [
   { id: "vintage-lv", skip: true, n: "Vintage Louis Vuitton (Ginza Grade A)", d: "Curated vintage from Tokyo's famously honest resale shops.", c: "Luxury", s: "Komehyo Ginza", t: "tokyo", p: 180000, mk: 15, f: 120000, vq: 1, v: ["Speedy 30", "Pochette Accessoires", "Alma PM"] },
   { id: "vintage-gucci", skip: true, n: "Vintage Gucci (Tokyo Resale)", d: "Old-logo Gucci in Japan-grade condition.", c: "Luxury", s: "2nd Street Harajuku", t: "tokyo", p: 88000, mk: 15, f: 100000, v: ["Ophidia Pouch", "Horsebit Loafer"] },
   { id: "cdg-wallet-var", skip: true, n: "CDG Leather Wallet", d: "More CDG wallet colors and sizes.", c: "Luxury", s: "Dover Street Market Ginza", t: "tokyo", p: 19800, mk: 20, v: ["Zip Coin Red", "Bifold Black", "Long Wallet"] },
-  { id: "gentlemonster-var", skip: true, n: "Gentle Monster", d: "More GM frames from the Seoul flagships.", c: "Luxury", s: "Gentle Monster Hongdae", t: "seoul", p: 280000, mk: 18, f: 70000, vq: 1, v: ["Lang Black", "My Ma Tortoise", "Bold Sunglasses"] },
   { id: "kaneko", skip: true, n: "Kaneko Optical Frame", d: "Sabae handmade eyewear, Japan's best-kept secret.", c: "Luxury", s: "Kaneko Gankyo Aoyama", t: "tokyo", p: 41800, mk: 18 },
   { id: "eyevan", skip: true, n: "Eyevan 7285 Frame", d: "Tokyo's poetic luxury eyewear.", c: "Luxury", s: "Eyevan Aoyama", t: "tokyo", p: 52800, mk: 18 },
   { id: "sailor-pen", skip: true, n: "Sailor Pro Gear Fountain Pen", d: "Hiroshima gold nibs with cult colorways.", c: "Luxury", s: "Itoya Ginza", t: "tokyo", p: 30800, mk: 18, v: ["Slim Black", "Ocean", "Yozakura"] },

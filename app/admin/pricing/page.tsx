@@ -8,9 +8,11 @@ import { formatIDR } from "@/lib/format";
 import { calculateQuote, paddedRate } from "@/lib/pricing";
 
 export default function AdminPricing() {
-  const { pricing, updatePricing, trips } = useStore();
+  const { pricing, updatePricing, trips, updateTripRate } = useStore();
   const [draft, setDraft] = useState(pricing);
   const [saved, setSaved] = useState(false);
+  const [rateDrafts, setRateDrafts] = useState<Record<string, number>>({});
+  const [rateSaved, setRateSaved] = useState<string | null>(null);
   const realRate = 108;
   const sample = calculateQuote({ basePriceForeign: 1000, exchangeRate: paddedRate(realRate, draft.exchange_rate_buffer_pct), markupPercentage: draft.default_markup_percentage, flatJastipFee: draft.default_flat_fee_idr });
 
@@ -23,7 +25,7 @@ export default function AdminPricing() {
           <Slider label="Default markup (upside)" suffix="%" value={draft.default_markup_percentage} min={0} max={60} onChange={(v) => { setDraft({ ...draft, default_markup_percentage: v }); setSaved(false); }} />
           <Slider label="Exchange rate buffer" suffix="%" value={draft.exchange_rate_buffer_pct} min={0} max={15} step={0.5} onChange={(v) => { setDraft({ ...draft, exchange_rate_buffer_pct: v }); setSaved(false); }} />
           <label className="text-sm font-bold text-muted">Flat jastip fee (IDR)
-            <input type="number" value={draft.default_flat_fee_idr} onChange={(e) => { setDraft({ ...draft, default_flat_fee_idr: Number(e.target.value) }); setSaved(false); }} className="mt-1 h-10 w-full rounded-lg border border-black/15 px-3 text-ink" />
+            <input type="number" value={draft.default_flat_fee_idr} onChange={(e) => { setDraft({ ...draft, default_flat_fee_idr: Number(e.target.value) }); setSaved(false); }} className="mt-1 h-10 w-full rounded-lg border border-edge/15 px-3 text-ink" />
           </label>
           <Button onClick={() => { updatePricing(draft); setSaved(true); }}>{saved ? "Saved ✓" : "Save Pricing"}</Button>
         </Card>
@@ -34,17 +36,40 @@ export default function AdminPricing() {
           <Row label="Base in IDR" value={formatIDR(sample.baseIdr)} />
           <Row label={`Upside ${draft.default_markup_percentage}%`} value={formatIDR(sample.markupIdr)} />
           <Row label="Flat fee" value={formatIDR(sample.flatFeeIdr)} />
-          <div className="mt-1 flex justify-between border-t border-black/10 pt-2 font-extrabold"><span>Customer pays</span><span className="text-brand-700">{formatIDR(sample.totalIdr)}</span></div>
+          <div className="mt-1 flex justify-between border-t border-edge/10 pt-2 font-extrabold"><span>Customer pays</span><span className="text-brand-700">{formatIDR(sample.totalIdr)}</span></div>
         </Card>
       </div>
       <Card className="mt-5 p-5">
         <div className="mb-3 font-bold">Trip exchange rates</div>
-        {trips.map((t) => (
-          <div key={t.id} className="flex items-center justify-between border-b border-black/[.05] py-2 text-sm last:border-0">
-            <span className="font-semibold">{t.name}</span>
-            <span className="text-muted">1 unit = <b className="text-ink">{t.system_exchange_rate} IDR</b> · {t.destination_country}</span>
-          </div>
-        ))}
+        <p className="mb-3 text-xs text-muted">This padded rate feeds the pricing engine for that trip&apos;s products — adjust it as the real-world rate moves.</p>
+        {trips.map((t) => {
+          const draftRate = rateDrafts[t.id] ?? t.system_exchange_rate;
+          const dirty = draftRate !== t.system_exchange_rate;
+          return (
+            <div key={t.id} className="flex items-center justify-between gap-3 border-b border-edge/[.05] py-2 text-sm last:border-0">
+              <div>
+                <span className="font-semibold">{t.name}</span>
+                <span className="ml-2 text-xs text-muted">{t.destination_country}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-muted">1 unit =</span>
+                <input
+                  type="number" step="0.1" value={draftRate}
+                  onChange={(e) => { setRateDrafts((d) => ({ ...d, [t.id]: Number(e.target.value) })); setRateSaved(null); }}
+                  className="h-8 w-24 rounded-lg border border-edge/15 px-2 text-right text-ink"
+                />
+                <span className="text-muted">IDR</span>
+                <Button
+                  className="h-8 px-3 text-xs"
+                  disabled={!dirty}
+                  onClick={() => { updateTripRate(t.id, draftRate); setRateSaved(t.id); }}
+                >
+                  {rateSaved === t.id && !dirty ? "Saved ✓" : "Save"}
+                </Button>
+              </div>
+            </div>
+          );
+        })}
       </Card>
     </div>
   );

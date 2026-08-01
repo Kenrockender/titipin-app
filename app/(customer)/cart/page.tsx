@@ -63,7 +63,7 @@ export default function CartPage() {
             <div className="mb-3 flex items-center gap-2 font-bold"><Icon name="sparkles" size={16} className="text-brand" /> Add-ons</div>
             <div className="flex flex-col gap-2">
               {addOns.map((a) => (
-                <label key={a.id} className="flex cursor-pointer items-center gap-3 rounded-lg border border-black/10 p-3 text-sm hover:border-brand">
+                <label key={a.id} className="flex cursor-pointer items-center gap-3 rounded-lg border border-edge/10 p-3 text-sm hover:border-brand">
                   <input type="checkbox" checked={selectedAddons.includes(a.id)}
                     onChange={(e) => setSelectedAddons(e.target.checked ? [...selectedAddons, a.id] : selectedAddons.filter((x) => x !== a.id))} />
                   <span className="flex-1 font-semibold">{a.name}</span>
@@ -84,7 +84,7 @@ export default function CartPage() {
                   key={opt.value}
                   type="button"
                   onClick={() => setDeliveryMethod(opt.value)}
-                  className={`rounded-lg border p-3 text-left text-sm transition ${deliveryMethod === opt.value ? "border-brand bg-brand-50" : "border-black/10 hover:border-brand/40"}`}
+                  className={`rounded-lg border p-3 text-left text-sm transition ${deliveryMethod === opt.value ? "border-brand bg-brand-50" : "border-edge/10 hover:border-brand/40"}`}
                 >
                   <div className={`font-bold ${deliveryMethod === opt.value ? "text-brand-700" : "text-ink"}`}>{opt.label}</div>
                   <div className="mt-0.5 text-xs text-muted">{opt.desc}</div>
@@ -99,12 +99,12 @@ export default function CartPage() {
             <div className="text-lg font-extrabold">Order Summary</div>
             <Row label="Items" value={formatIDR(itemsTotal)} />
             <Row label="Add-ons" value={formatIDR(addonTotal)} />
-            <div className="flex justify-between border-t border-black/10 pt-2 text-lg font-extrabold"><span>Total</span><span>{formatIDR(total)}</span></div>
+            <div className="flex justify-between border-t border-edge/10 pt-2 text-lg font-extrabold"><span>Total</span><span>{formatIDR(total)}</span></div>
             <div className="mt-2 rounded-xl bg-brand-50 p-3">
               <div className="mb-2 text-sm font-bold text-brand-700">Down payment</div>
               <div className="mb-2 flex gap-2">
                 {[0.5, 0.6, 0.7].map((r) => (
-                  <button key={r} onClick={() => setDpRatio(r)} className={`flex-1 rounded-lg py-1.5 text-sm font-bold ${dpRatio === r ? "bg-brand text-white" : "bg-white text-brand-700 border border-brand-100"}`}>{r * 100}%</button>
+                  <button key={r} onClick={() => setDpRatio(r)} className={`flex-1 rounded-lg py-1.5 text-sm font-bold ${dpRatio === r ? "bg-brand text-white" : "bg-surface text-brand-700 border border-brand-100"}`}>{r * 100}%</button>
                 ))}
               </div>
               <div className="flex justify-between text-sm"><span className="text-muted">Pay now (DP)</span><span className="font-extrabold text-brand-700">{formatIDR(dp)}</span></div>

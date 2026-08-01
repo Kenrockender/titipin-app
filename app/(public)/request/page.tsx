@@ -62,7 +62,7 @@ export default function RequestPage() {
           </Field>
           <div>
             <label className="mb-1.5 block text-sm font-bold">Reference photos / screenshots</label>
-            <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-black/15 py-8 text-center hover:border-brand">
+            <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-edge/15 py-8 text-center hover:border-brand">
               <Icon name="image-plus" size={26} className="text-faint" />
               <span className="text-sm text-muted">Click to upload multiple images</span>
               <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files)} />
