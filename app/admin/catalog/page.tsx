@@ -41,7 +41,7 @@ export default function AdminCatalog() {
         {products.map((p) => (
           <Card key={p.id} className="flex items-center gap-3 p-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.image_url} alt="" className="h-16 w-16 rounded-lg object-cover" />
+            <img src={p.image_url} alt="" className="h-16 w-16 flex-none rounded-lg object-cover" />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2"><span className="truncate font-bold">{p.name || "(untitled)"}</span>{!p.is_active && <Badge tone="neutral">Hidden</Badge>}</div>
               <div className="text-xs text-muted">{p.category} · {p.store_location}</div>

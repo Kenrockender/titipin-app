@@ -81,15 +81,19 @@ export default function OrderDetail() {
         <div className="mb-3 font-bold">Items</div>
         <div className="flex flex-col gap-3">
           {order.items.map((it) => (
-            <div key={it.id} className="flex items-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={it.image_url} alt="" className="h-14 w-14 rounded-lg object-cover" />
-              <div className="flex-1">
-                <div className="font-semibold">{it.item_name}</div>
-                <div className="text-xs text-muted">Qty {it.quantity} · {it.store_location}</div>
+            <div key={it.id} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={it.image_url} alt="" className="h-14 w-14 flex-none rounded-lg object-cover" />
+                <div className="min-w-0">
+                  <div className="truncate font-semibold">{it.item_name}</div>
+                  <div className="truncate text-xs text-muted">Qty {it.quantity} · {it.store_location}</div>
+                </div>
               </div>
-              <StatusBadge status={it.item_status} />
-              <div className="w-24 text-right font-bold">{formatIDR(it.locked_price_idr * it.quantity)}</div>
+              <div className="flex flex-none items-center justify-between gap-3 sm:ml-auto sm:justify-end">
+                <StatusBadge status={it.item_status} />
+                <div className="w-24 text-right font-bold">{formatIDR(it.locked_price_idr * it.quantity)}</div>
+              </div>
             </div>
           ))}
         </div>

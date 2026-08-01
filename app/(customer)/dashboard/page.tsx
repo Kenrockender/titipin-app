@@ -32,22 +32,26 @@ export default function DashboardPage() {
         {myOrders.length === 0 && <Card className="p-6 text-center text-muted">No orders yet. <Link href="/catalog" className="text-brand">Browse the catalog →</Link></Card>}
         {myOrders.map((o) => (
           <Link key={o.id} href={`/dashboard/${o.id}`}>
-            <Card className="flex items-center gap-4 p-4 transition hover:shadow-lg">
-              <div className="flex -space-x-3">
-                {o.items.slice(0, 3).map((it) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={it.id} src={it.image_url} alt="" className="h-11 w-11 rounded-lg border-2 border-surface object-cover" />
-                ))}
+            <Card className="flex flex-col gap-3 p-4 transition hover:shadow-lg sm:flex-row sm:items-center sm:gap-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex flex-none -space-x-3">
+                  {o.items.slice(0, 3).map((it) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={it.id} src={it.image_url} alt="" className="h-11 w-11 flex-none rounded-lg border-2 border-surface object-cover" />
+                  ))}
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate font-bold">Order #{shortId(o.id)}</div>
+                  <div className="truncate text-sm text-muted">{o.items.length} item(s) · {formatDate(o.created_at)}</div>
+                </div>
               </div>
-              <div className="flex-1">
-                <div className="font-bold">Order #{shortId(o.id)}</div>
-                <div className="text-sm text-muted">{o.items.length} item(s) · {formatDate(o.created_at)}</div>
+              <div className="flex flex-none items-center justify-between gap-3 sm:ml-auto sm:justify-end">
+                <div className="flex flex-col items-start gap-1 sm:items-end">
+                  <StatusBadge status={o.status} />
+                  <div className="font-extrabold">{formatIDR(o.total_price_idr)}</div>
+                </div>
+                <Icon name="chevron-right" size={18} className="flex-none text-faint" />
               </div>
-              <div className="text-right">
-                <StatusBadge status={o.status} />
-                <div className="mt-1 font-extrabold">{formatIDR(o.total_price_idr)}</div>
-              </div>
-              <Icon name="chevron-right" size={18} className="text-faint" />
             </Card>
           </Link>
         ))}
@@ -57,17 +61,19 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-3">
         {myRequests.length === 0 && <Card className="p-6 text-center text-muted">No requests yet. <Link href="/request" className="text-brand">Request an item →</Link></Card>}
         {myRequests.map((r) => (
-          <Card key={r.id} className="flex items-center gap-4 p-4">
-            {r.uploaded_image_urls?.[0] && /* eslint-disable-next-line @next/next/no-img-element */ (
-              <img src={r.uploaded_image_urls[0]} alt="" className="h-12 w-12 rounded-lg object-cover" />
-            )}
-            <div className="flex-1">
-              <div className="font-bold">{r.product_name_or_desc}</div>
-              <div className="text-sm text-muted">Qty {r.quantity}{r.variations && ` · ${r.variations}`}</div>
+          <Card key={r.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
+            <div className="flex min-w-0 items-center gap-3">
+              {r.uploaded_image_urls?.[0] && /* eslint-disable-next-line @next/next/no-img-element */ (
+                <img src={r.uploaded_image_urls[0]} alt="" className="h-12 w-12 flex-none rounded-lg object-cover" />
+              )}
+              <div className="min-w-0">
+                <div className="truncate font-bold">{r.product_name_or_desc}</div>
+                <div className="truncate text-sm text-muted">Qty {r.quantity}{r.variations && ` · ${r.variations}`}</div>
+              </div>
             </div>
-            <div className="text-right">
+            <div className="flex flex-col items-start gap-1 sm:ml-auto sm:items-end">
               <StatusBadge status={r.status} />
-              {r.quoted_price_idr && <div className="mt-1 text-sm">Quote: <b>{formatIDR(r.quoted_price_idr)}</b></div>}
+              {r.quoted_price_idr && <div className="text-sm">Quote: <b>{formatIDR(r.quoted_price_idr)}</b></div>}
             </div>
           </Card>
         ))}

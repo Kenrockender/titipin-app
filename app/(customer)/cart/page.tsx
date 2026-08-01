@@ -49,13 +49,13 @@ export default function CartPage() {
           {cart.map((l) => (
             <Card key={l.product.id} className="flex items-center gap-4 p-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={l.product.image_url} alt="" className="h-16 w-16 rounded-lg object-cover" />
-              <div className="flex-1">
-                <div className="font-bold">{l.product.name}</div>
-                <div className="text-sm text-muted">Qty {l.quantity} · {l.product.store_location}</div>
+              <img src={l.product.image_url} alt="" className="h-16 w-16 flex-none rounded-lg object-cover" />
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-bold">{l.product.name}</div>
+                <div className="truncate text-sm text-muted">Qty {l.quantity} · {l.product.store_location}</div>
               </div>
-              <div className="text-right font-extrabold">{formatIDR(l.product.final_price_idr * l.quantity)}</div>
-              <button onClick={() => removeFromCart(l.product.id)} className="text-faint hover:text-red-600 dark:hover:text-red-400"><Icon name="trash-2" size={18} /></button>
+              <div className="flex-none text-right font-extrabold">{formatIDR(l.product.final_price_idr * l.quantity)}</div>
+              <button onClick={() => removeFromCart(l.product.id)} className="flex-none text-faint hover:text-red-600 dark:hover:text-red-400"><Icon name="trash-2" size={18} /></button>
             </Card>
           ))}
 
