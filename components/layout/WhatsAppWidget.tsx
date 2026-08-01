@@ -6,6 +6,10 @@ const WA = process.env.NEXT_PUBLIC_WA_NUMBER || "6281234567890";
 export function waLink(message: string) {
   return `https://wa.me/${WA}?text=${encodeURIComponent(message)}`;
 }
+// For admin -> customer messages, targeting the customer's own WhatsApp number.
+export function waLinkTo(phone: string, message: string) {
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
 
 export function WhatsAppWidget({ context }: { context?: string }) {
   const msg = context ? `Hi Titipin! ${context}` : "Hi Titipin! I have a question about jastip.";

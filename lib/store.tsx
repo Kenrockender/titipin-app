@@ -145,6 +145,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const id = uid("req");
     const row: CustomRequest = {
       id, user_id: currentUser?.id ?? "guest",
+      customer_name: currentUser?.full_name ?? "Guest",
+      customer_whatsapp: currentUser?.whatsapp_number ?? "",
       product_name_or_desc: r.product_name_or_desc ?? "",
       product_url: r.product_url ?? null,
       uploaded_image_urls: r.uploaded_image_urls ?? null,
@@ -174,7 +176,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const addonTotal = addonIds.reduce((s, aid) => s + (seed.addOns.find((a) => a.id === aid)?.price_idr ?? 0), 0);
     const total = items.reduce((s, i) => s + i.locked_price_idr * i.quantity, 0) + addonTotal;
     const order: Order = {
-      id, user_id: currentUser?.id ?? "guest", trip_id: products[0]?.trip_id ?? "trip-tokyo",
+      id, user_id: currentUser?.id ?? "guest",
+      customer_name: currentUser?.full_name ?? "Guest",
+      customer_whatsapp: currentUser?.whatsapp_number ?? "",
+      trip_id: products[0]?.trip_id ?? "trip-tokyo",
       total_price_idr: total, total_dp_required_idr: calculateDP(total, dpRatio),
       local_shipping_fee_idr: null, delivery_method: deliveryMethod, status: "Waiting DP",
       created_at: new Date().toISOString(), items, addon_ids: addonIds

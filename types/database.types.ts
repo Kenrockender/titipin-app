@@ -59,6 +59,8 @@ export interface CatalogProduct {
 export interface CustomRequest {
   id: string;
   user_id: string;
+  customer_name: string;
+  customer_whatsapp: string;
   product_name_or_desc: string;
   product_url: string | null;
   uploaded_image_urls: string[] | null;
@@ -87,6 +89,8 @@ export interface OrderItem {
 export interface Order {
   id: string;
   user_id: string;
+  customer_name: string;
+  customer_whatsapp: string;
   trip_id: string;
   total_price_idr: number;
   total_dp_required_idr: number;

@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { formatIDR, formatDate, shortId } from "@/lib/format";
 import { waLink } from "@/components/layout/WhatsAppWidget";
+import { BANK_ACCOUNT_INFO } from "@/lib/constants";
 
 const TIMELINE = ["Waiting DP", "DP Paid", "Purchased Overseas", "Shipped to ID", "Awaiting Final Payment", "Completed"];
 
@@ -106,7 +107,7 @@ export default function OrderDetail() {
               <span className="font-bold text-brand-700">{needsDP ? "Pay Down Payment" : "Pay Final Balance"}</span>
               <span className="text-lg font-extrabold text-brand-700">{formatIDR(needsDP ? order.total_dp_required_idr : finalBalance)}</span>
             </div>
-            <p className="mb-3 text-xs text-muted">Transfer to <b>BCA 1234567890 a/n Titipin</b> or scan QRIS, then upload your receipt.</p>
+            <p className="mb-3 text-xs text-muted">Transfer to <b>{BANK_ACCOUNT_INFO}</b> or scan QRIS, then upload your receipt.</p>
             <label className="mb-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brand/40 py-4 text-sm font-semibold text-brand-700 hover:bg-white">
               <Icon name="upload" size={16} /> {receipt ? "Receipt attached ✓" : "Upload transfer receipt"}
               <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onload = () => setReceipt(r.result as string); r.readAsDataURL(f); } }} />

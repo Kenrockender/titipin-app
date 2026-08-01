@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { formatIDR, formatDate, shortId } from "@/lib/format";
-import type { OrderStatus } from "@/types/database.types";
+import { waLinkTo } from "@/components/layout/WhatsAppWidget";
+import { BANK_ACCOUNT_INFO } from "@/lib/constants";
+import type { Order, OrderStatus } from "@/types/database.types";
 
 const NEXT: Partial<Record<OrderStatus, OrderStatus>> = {
   "Waiting DP": "DP Paid", "DP Paid": "Purchased Overseas", "Purchased Overseas": "Shipped to ID",
@@ -32,7 +34,7 @@ export default function AdminOrders() {
               </div>
               <div className="flex-1">
                 <div className="font-bold">#{shortId(o.id)} · {o.items.length} item(s)</div>
-                <div className="text-xs text-muted">{formatDate(o.created_at)}</div>
+                <div className="text-xs text-muted">{o.customer_name} · {formatDate(o.created_at)}</div>
               </div>
               <span className={`hidden rounded-full px-2.5 py-1 text-[11px] font-bold sm:inline-block ${o.delivery_method === "GoSend" ? "bg-blue-50 text-blue-700" : "bg-black/[.05] text-muted"}`}>
                 {o.delivery_method === "GoSend" ? "GoSend" : "Pickup"}
@@ -61,6 +63,11 @@ export default function AdminOrders() {
                     <div className="mt-3 flex flex-wrap gap-2">
                       {NEXT[o.status] && <Button className="h-9" onClick={() => setOrderStatus(o.id, NEXT[o.status]!)}>Advance → {NEXT[o.status]}</Button>}
                       {o.status !== "Cancelled" && o.status !== "Completed" && <Button variant="outline" className="h-9" onClick={() => setOrderStatus(o.id, "Cancelled")}>Cancel</Button>}
+                      {o.customer_whatsapp && (
+                        <a href={waLinkTo(o.customer_whatsapp, waMessage(o))} target="_blank" rel="noreferrer">
+                          <Button variant="outline" className="h-9"><Icon name="message-circle" size={15} /> Chat WA</Button>
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -74,4 +81,16 @@ export default function AdminOrders() {
 }
 function Row({ label, value }: { label: string; value: string }) {
   return <div className="flex justify-between text-muted"><span>{label}</span><span className="font-semibold text-ink">{value}</span></div>;
+}
+
+function waMessage(o: Order): string {
+  const header = `Hi ${o.customer_name}, soal order #${shortId(o.id)} kamu`;
+  if (o.status === "Waiting DP") {
+    return `${header} — total ${formatIDR(o.total_price_idr)}, DP yang perlu ditransfer: ${formatIDR(o.total_dp_required_idr)} ke ${BANK_ACCOUNT_INFO}. Setelah transfer, upload bukti di halaman order ya. Terima kasih!`;
+  }
+  if (o.status === "Awaiting Final Payment") {
+    const balance = o.total_price_idr - o.total_dp_required_idr + (o.local_shipping_fee_idr ?? 0);
+    return `${header} — barang sudah siap dikirim. Sisa pelunasan: ${formatIDR(balance)} ke ${BANK_ACCOUNT_INFO}. Setelah transfer, upload bukti di halaman order ya. Terima kasih!`;
+  }
+  return `${header} — `;
 }

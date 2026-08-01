@@ -5,8 +5,10 @@ import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
-import { formatIDR, formatDate } from "@/lib/format";
+import { formatIDR, formatDate, shortId } from "@/lib/format";
 import { calculateQuote, calculateDP, DEFAULT_PRICING } from "@/lib/pricing";
+import { waLinkTo } from "@/components/layout/WhatsAppWidget";
+import { BANK_ACCOUNT_INFO } from "@/lib/constants";
 
 export default function AdminRequests() {
   const { requests, quoteRequest, setRequestStatus, pricing, trips } = useStore();
@@ -28,13 +30,23 @@ export default function AdminRequests() {
                   <span className="font-bold">{r.product_name_or_desc}</span>
                   <StatusBadge status={r.status} />
                 </div>
-                <div className="text-sm text-muted">Qty {r.quantity}{r.variations && ` · ${r.variations}`} · {formatDate(r.created_at)}</div>
+                <div className="text-sm text-muted">{r.customer_name} · Qty {r.quantity}{r.variations && ` · ${r.variations}`} · {formatDate(r.created_at)}</div>
                 {r.product_url && <a href={r.product_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline"><Icon name="link" size={13} /> Source link</a>}
                 {r.quoted_price_idr && <div className="mt-1 text-sm">Quoted <b>{formatIDR(r.quoted_price_idr)}</b> · DP <b>{formatIDR(r.required_dp_idr ?? 0)}</b></div>}
               </div>
-              <div className="flex flex-none gap-2">
+              <div className="flex flex-none flex-wrap gap-2">
                 {r.status === "Pending Review" && <Button className="h-9" onClick={() => setOpenId(openId === r.id ? null : r.id)}><Icon name="calculator" size={15} color="#fff" /> Quote</Button>}
                 {r.status === "Pending Review" && <Button variant="outline" className="h-9" onClick={() => setRequestStatus(r.id, "Rejected")}>Reject</Button>}
+                {r.customer_whatsapp && (
+                  <a
+                    href={waLinkTo(r.customer_whatsapp, r.quoted_price_idr
+                      ? `Hi ${r.customer_name}, request kamu untuk "${r.product_name_or_desc}" (req #${shortId(r.id)}) sudah saya quote:\n\nTotal: ${formatIDR(r.quoted_price_idr)}\nDP: ${formatIDR(r.required_dp_idr ?? 0)}\n\nSilakan transfer DP ke ${BANK_ACCOUNT_INFO}, lalu upload bukti transfer di app ya. Terima kasih!`
+                      : `Hi ${r.customer_name}, soal request kamu "${r.product_name_or_desc}" (req #${shortId(r.id)}) — `)}
+                    target="_blank" rel="noreferrer"
+                  >
+                    <Button variant="outline" className="h-9"><Icon name="message-circle" size={15} /> Chat WA</Button>
+                  </a>
+                )}
               </div>
             </div>
             {openId === r.id && <QuoteTool onQuote={(price, dp) => { quoteRequest(r.id, price, dp); setOpenId(null); }} rate={trips[0]?.system_exchange_rate ?? 112} pricing={pricing} qty={r.quantity} />}

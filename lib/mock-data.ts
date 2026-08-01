@@ -101,13 +101,15 @@ export const addOns: AddOn[] = [
 
 export const requests: CustomRequest[] = [
   {
-    id: "req-1001", user_id: "user-001", product_name_or_desc: "Nike Air Max 1 'Patta' — from SNKRS JP",
+    id: "req-1001", user_id: "user-001", customer_name: "Rani Pratiwi", customer_whatsapp: "6281200001111",
+    product_name_or_desc: "Nike Air Max 1 'Patta' — from SNKRS JP",
     product_url: "https://www.nike.com/jp/", uploaded_image_urls: [IMG("photo-1542291026-7eec264c27ff")],
     quantity: 1, variations: "US 8.5, Red/White", status: "Pending Review",
     quoted_price_idr: null, required_dp_idr: null, created_at: "2026-07-10T04:20:00Z"
   },
   {
-    id: "req-1002", user_id: "user-002", product_name_or_desc: "Muji Aroma Diffuser (large)",
+    id: "req-1002", user_id: "user-002", customer_name: "Dewi Anggraini", customer_whatsapp: "6281200002222",
+    product_name_or_desc: "Muji Aroma Diffuser (large)",
     product_url: "https://www.muji.com/jp/", uploaded_image_urls: [IMG("photo-1602874801007-bd458bb1b8b6")],
     quantity: 2, variations: "White", status: "Quote Sent",
     quoted_price_idr: 890000, required_dp_idr: 534000, created_at: "2026-07-08T02:00:00Z"
@@ -116,7 +118,7 @@ export const requests: CustomRequest[] = [
 
 export const orders: Order[] = [
   {
-    id: "order-5001", user_id: "user-001", trip_id: "trip-tokyo",
+    id: "order-5001", user_id: "user-001", customer_name: "Rani Pratiwi", customer_whatsapp: "6281200001111", trip_id: "trip-tokyo",
     total_price_idr: 570500, total_dp_required_idr: 342000, local_shipping_fee_idr: null,
     delivery_method: "GoSend",
     status: "DP Paid", created_at: "2026-07-06T08:30:00Z", addon_ids: ["addon-bubblewrap"],
@@ -127,7 +129,7 @@ export const orders: Order[] = [
     ]
   },
   {
-    id: "order-5002", user_id: "user-003", trip_id: "trip-tokyo",
+    id: "order-5002", user_id: "user-003", customer_name: "Budi Santoso", customer_whatsapp: "6281200003333", trip_id: "trip-tokyo",
     total_price_idr: 1381500, total_dp_required_idr: 828900, local_shipping_fee_idr: null,
     delivery_method: "Pickup",
     status: "Waiting DP", created_at: "2026-07-11T10:00:00Z", addon_ids: [],
@@ -136,7 +138,7 @@ export const orders: Order[] = [
     ]
   },
   {
-    id: "order-5003", user_id: "user-001", trip_id: "trip-tokyo",
+    id: "order-5003", user_id: "user-001", customer_name: "Rani Pratiwi", customer_whatsapp: "6281200001111", trip_id: "trip-tokyo",
     total_price_idr: 805000, total_dp_required_idr: 483000, local_shipping_fee_idr: 35000,
     delivery_method: "GoSend",
     status: "Awaiting Final Payment", created_at: "2026-06-20T06:00:00Z", addon_ids: ["addon-giftbox"],
