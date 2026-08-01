@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #2563EB;
+  --font-jakarta: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-cormorant: "Cormorant Garamond", Georgia, serif;
+}
+html { -webkit-font-smoothing: antialiased; }
+body { background: #faf9f7; color: #1c1917; font-family: var(--font-jakarta); }
+::selection { background: #DBEAFE; }
+
+/* Luxury section: gold selection + thin gold scrollbar on dark bg */
+.luxury ::selection { background: rgba(212,175,55,.3); color: #FCF6BA; }
+.luxury .lux-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+.luxury .lux-scroll::-webkit-scrollbar-thumb { background: rgba(212,175,55,.4); border-radius: 9999px; }
+.luxury .lux-scroll::-webkit-scrollbar-track { background: transparent; }

@@ -1,0 +1,11 @@
+node_modules
+.next
+.env.local
+*.log
+.DS_Store
+service-account.json
+service-account*.json
+*.tsbuildinfo
+
+# Original AI-generated haul PNGs (large; optimized copies live in public/hauls)
+_haul-originals/
