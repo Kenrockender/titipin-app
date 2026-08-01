@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useStore } from "@/lib/store";
 import { Icon } from "@/components/ui/Icon";
@@ -9,10 +10,16 @@ import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { formatIDR, formatDate, shortId } from "@/lib/format";
 
 export default function DashboardPage() {
-  const { currentUser, orders, requests } = useStore();
+  const { currentUser, orders, requests, acceptQuote } = useStore();
+  const router = useRouter();
   if (!currentUser) return <NeedLogin />;
   const myOrders = orders.filter((o) => o.user_id === currentUser.id);
   const myRequests = requests.filter((r) => r.user_id === currentUser.id);
+
+  const accept = (requestId: string) => {
+    const orderId = acceptQuote(requestId);
+    router.push(`/dashboard/${orderId}`);
+  };
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-10">
@@ -71,9 +78,12 @@ export default function DashboardPage() {
                 <div className="truncate text-sm text-muted">Qty {r.quantity}{r.variations && ` · ${r.variations}`}</div>
               </div>
             </div>
-            <div className="flex flex-col items-start gap-1 sm:ml-auto sm:items-end">
+            <div className="flex flex-col items-start gap-2 sm:ml-auto sm:items-end">
               <StatusBadge status={r.status} />
               {r.quoted_price_idr && <div className="text-sm">Quote: <b>{formatIDR(r.quoted_price_idr)}</b></div>}
+              {r.status === "Quote Sent" && (
+                <Button className="h-9" onClick={() => accept(r.id)}>Accept & Pay DP →</Button>
+              )}
             </div>
           </Card>
         ))}

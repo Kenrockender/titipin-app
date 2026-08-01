@@ -29,7 +29,12 @@ export default function ShopperMode() {
 
   const secure = (orderId: string, item: Line) => {
     setItemStatus(orderId, item.id, "Secured");
-    setToast(`WhatsApp sent: "Good news! I just secured your ${item.item_name}!"`);
+    if (item.customerWhatsapp) {
+      window.open(waLinkTo(item.customerWhatsapp, `Hi! Good news, I just secured your "${item.item_name}"! It's on its way home soon.`), "_blank", "noopener,noreferrer");
+      setToast(`WhatsApp opened: "Good news! I just secured your ${item.item_name}!"`);
+    } else {
+      setToast(`Secured — no WhatsApp number on file for this customer.`);
+    }
     setTimeout(() => setToast(null), 3500);
   };
 

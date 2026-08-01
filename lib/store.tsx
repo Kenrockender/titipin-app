@@ -47,6 +47,7 @@ interface StoreActions {
   placeOrder: (opts: { addonIds: string[]; dpRatio: number; deliveryMethod: DeliveryMethod }) => string;
   markPayment: (orderId: string, type: "Down Payment" | "Final Payment") => void;
   quoteRequest: (id: string, quotedIdr: number, dpIdr: number) => void;
+  acceptQuote: (requestId: string) => string;
   setRequestStatus: (id: string, status: RequestStatus) => void;
   setItemStatus: (orderId: string, itemId: string, status: ItemStatus) => void;
   setOrderStatus: (orderId: string, status: OrderStatus) => void;
@@ -244,6 +245,38 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setRequests((rs) => rs.map((r) => r.id === id
       ? { ...r, status: "Quote Sent", quoted_price_idr: quotedIdr, required_dp_idr: dpIdr } : r));
   }, []);
+
+  // Turns a quoted custom request into a real Order, so it goes through the
+  // same DP -> receipt-upload -> pipeline flow as a catalog order.
+  const acceptQuote = useCallback<StoreActions["acceptQuote"]>((requestId) => {
+    const req = requests.find((r) => r.id === requestId);
+    if (!req || req.quoted_price_idr == null || req.required_dp_idr == null) {
+      throw new Error("This request doesn't have a quote yet");
+    }
+    const orderId = uid("order");
+    const item: OrderItem = {
+      id: uid("oi"), order_id: orderId, product_id: null, request_id: req.id,
+      item_name: req.product_name_or_desc, quantity: req.quantity,
+      locked_price_idr: Math.round(req.quoted_price_idr / req.quantity),
+      store_location: "Custom Request", item_status: "Pending Purchase",
+      admin_receipt_url: null, image_url: req.uploaded_image_urls?.[0] ?? "/products/_placeholder.svg"
+    };
+    const order: Order = {
+      id: orderId, user_id: req.user_id, customer_name: req.customer_name, customer_whatsapp: req.customer_whatsapp,
+      trip_id: trips[0]?.id ?? "trip-tokyo",
+      total_price_idr: req.quoted_price_idr, total_dp_required_idr: req.required_dp_idr,
+      local_shipping_fee_idr: null, delivery_method: "Pickup", status: "Waiting DP",
+      created_at: new Date().toISOString(), items: [item], addon_ids: []
+    };
+    setOrders((os) => [order, ...os]);
+    setRequests((rs) => rs.map((r) => r.id === requestId ? { ...r, status: "Accepted" } : r));
+    notifyTelegram(
+      `✅ ${req.customer_name} terima quote buat "${req.product_name_or_desc}"\n` +
+      `Order baru #${shortId(orderId)} otomatis dibuat — Total: ${formatIDR(req.quoted_price_idr)} · DP: ${formatIDR(req.required_dp_idr)}`
+    );
+    return orderId;
+  }, [requests, trips]);
+
   const setRequestStatus = useCallback<StoreActions["setRequestStatus"]>((id, status) => {
     setRequests((rs) => rs.map((r) => r.id === id ? { ...r, status } : r));
   }, []);
@@ -285,11 +318,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(() => ({
     currentUser, isAdmin, authLoading, trips, products, requests, orders, addOns: seed.addOns, pricing, cart, hauls: seed.hauls, heroHauls: seed.heroHauls,
     signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, decrementCartItem, clearCart, submitRequest,
-    placeOrder, markPayment, quoteRequest, setRequestStatus, setItemStatus, setOrderStatus,
+    placeOrder, markPayment, quoteRequest, acceptQuote, setRequestStatus, setItemStatus, setOrderStatus,
     refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing, updateTripRate
   }), [currentUser, isAdmin, authLoading, trips, products, requests, orders, pricing, cart,
     signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, decrementCartItem, clearCart, submitRequest,
-    placeOrder, markPayment, quoteRequest, setRequestStatus, setItemStatus, setOrderStatus,
+    placeOrder, markPayment, quoteRequest, acceptQuote, setRequestStatus, setItemStatus, setOrderStatus,
     refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing, updateTripRate]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
