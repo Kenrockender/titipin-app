@@ -25,8 +25,7 @@ function LoginForm() {
   const rawNext = params.get("next") || "";
   const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard";
 
-  // signInWithGoogle navigates away to Google and back — once auth resolves
-  // (either on return from redirect, or if already logged in), move on.
+  // Already signed in (e.g. revisiting /login) — move on without a fresh popup.
   useEffect(() => {
     if (!authLoading && currentUser) router.push(isAdmin ? "/admin" : next);
   }, [authLoading, currentUser, isAdmin, next, router]);
@@ -35,7 +34,8 @@ function LoginForm() {
     setError(null);
     setLoading(true);
     try {
-      await signInWithGoogle();
+      const admin = await signInWithGoogle();
+      router.push(admin ? "/admin" : next);
     } catch {
       setError("Login gagal. Coba lagi.");
       setLoading(false);
@@ -51,7 +51,7 @@ function LoginForm() {
       </div>
       <Card className="p-6">
         <Button className="h-11 w-full" onClick={submit} disabled={loading}>
-          {loading ? "Redirecting to Google…" : "Continue with Google"}
+          {loading ? "Signing in…" : "Continue with Google"}
         </Button>
         {error && <p className="mt-3 text-center text-sm text-red-600">{error}</p>}
       </Card>

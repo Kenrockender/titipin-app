@@ -9,3 +9,5 @@ service-account*.json
 
 # Original AI-generated haul PNGs (large; optimized copies live in public/hauls)
 _haul-originals/
+
+.vercel

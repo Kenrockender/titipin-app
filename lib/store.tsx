@@ -3,7 +3,7 @@
 // the whole flow (cart -> checkout -> DP -> Secured -> OOS -> store credit) works
 // end-to-end in the browser. Swap these actions for Supabase queries later.
 import React, { createContext, useContext, useMemo, useState, useCallback, useEffect } from "react";
-import { onAuthStateChanged, signInWithRedirect, signOut as firebaseSignOut } from "firebase/auth";
+import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import type {
   AddOn, CatalogProduct, CustomRequest, DeliveryMethod, ItemStatus, Order, OrderItem,
@@ -12,6 +12,8 @@ import type {
 import { DEFAULT_PRICING, calculateDP } from "@/lib/pricing";
 import * as seed from "@/lib/mock-data";
 import { auth, db, googleProvider } from "@/lib/firebase/client";
+import { notifyTelegram } from "@/lib/telegram";
+import { formatIDR, shortId } from "@/lib/format";
 
 export interface CartLine { product: CatalogProduct; quantity: number; }
 
@@ -33,7 +35,7 @@ interface StoreState {
 export interface HaulImage { src: string; alt: string; }
 
 interface StoreActions {
-  signInWithGoogle: () => Promise<void>; // navigates to Google, then back; onAuthStateChanged picks up the result
+  signInWithGoogle: () => Promise<boolean>; // returns true if the signed-in email is an admin
   logout: () => void;
   updateProfile: (patch: Partial<Pick<User, "full_name" | "whatsapp_number" | "shipping_address">>) => void;
   addToCart: (product: CatalogProduct, quantity?: number) => void;
@@ -110,7 +112,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = useCallback<StoreActions["signInWithGoogle"]>(async () => {
     if (!auth || !googleProvider) throw new Error("Firebase is not configured");
-    await signInWithRedirect(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    return isAdminEmail(result.user.email ?? "");
   }, []);
 
   const logout = useCallback(() => {
@@ -150,6 +153,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       created_at: new Date().toISOString()
     };
     setRequests((rs) => [row, ...rs]);
+    notifyTelegram(
+      `🆕 Request baru dari ${currentUser?.full_name ?? "Guest"} (${currentUser?.email ?? "-"})\n` +
+      `Produk: ${row.product_name_or_desc}\n` +
+      `Qty: ${row.quantity}${row.variations ? ` · ${row.variations}` : ""}\n` +
+      (row.product_url ? `Link: ${row.product_url}\n` : "") +
+      `\nBuka Request Inbox di admin untuk kirim quote.`
+    );
     return id;
   }, [currentUser]);
 
@@ -171,6 +181,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     };
     setOrders((os) => [order, ...os]);
     setCart([]);
+    notifyTelegram(
+      `🛒 Order baru #${shortId(id)} dari ${currentUser?.full_name ?? "Guest"} (${currentUser?.email ?? "-"})\n` +
+      `${items.map((it) => `• ${it.item_name} ×${it.quantity}`).join("\n")}\n` +
+      `Total: ${formatIDR(total)} · DP: ${formatIDR(order.total_dp_required_idr)}\n` +
+      `Delivery: ${deliveryMethod}`
+    );
     return id;
   }, [cart, currentUser, products]);
 

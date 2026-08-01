@@ -21,7 +21,8 @@ export default function RegisterPage() {
     setError(null);
     setLoading(true);
     try {
-      await signInWithGoogle();
+      const admin = await signInWithGoogle();
+      router.push(admin ? "/admin" : "/profile");
     } catch {
       setError("Sign up gagal. Coba lagi.");
       setLoading(false);
@@ -37,7 +38,7 @@ export default function RegisterPage() {
       </div>
       <Card className="p-6">
         <Button className="h-11 w-full" onClick={submit} disabled={loading}>
-          {loading ? "Redirecting to Google…" : "Continue with Google"}
+          {loading ? "Signing in…" : "Continue with Google"}
         </Button>
         {error && <p className="mt-3 text-center text-sm text-red-600">{error}</p>}
       </Card>
