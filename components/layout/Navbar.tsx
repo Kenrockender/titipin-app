@@ -56,7 +56,17 @@ export function Navbar() {
           {isAdmin && link("/admin", "Admin")}
           {cartLink}
           {currentUser ? (
-            <button onClick={logout} className="h-9 rounded-[10px] border border-black/15 bg-white px-4 text-sm font-bold hover:border-ink">Logout</button>
+            <div className="flex items-center gap-2.5">
+              <Link href="/profile" aria-label="Profile" className="flex-none">
+                {currentUser.photo_url ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={currentUser.photo_url} alt={currentUser.full_name} className="h-8 w-8 rounded-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 text-xs font-extrabold text-brand-700">{currentUser.full_name[0]}</span>
+                )}
+              </Link>
+              <button onClick={logout} className="h-9 rounded-[10px] border border-black/15 bg-white px-4 text-sm font-bold hover:border-ink">Logout</button>
+            </div>
           ) : (
             <Link href="/login" className="h-9 rounded-[10px] border border-black/15 bg-white px-4 text-sm font-bold leading-9 hover:border-ink">Login</Link>
           )}
@@ -87,7 +97,18 @@ export function Navbar() {
           </div>
           <div className="mt-3 border-t border-black/[.06] pt-3">
             {currentUser ? (
-              <button onClick={logout} className="h-10 w-full rounded-[10px] border border-black/15 bg-white text-sm font-bold hover:border-ink">Logout</button>
+              <>
+                <Link href="/profile" className="mb-3 flex items-center gap-2.5 px-1">
+                  {currentUser.photo_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={currentUser.photo_url} alt={currentUser.full_name} className="h-9 w-9 rounded-full object-cover" referrerPolicy="no-referrer" />
+                  ) : (
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-sm font-extrabold text-brand-700">{currentUser.full_name[0]}</span>
+                  )}
+                  <span className="text-sm font-bold">{currentUser.full_name}</span>
+                </Link>
+                <button onClick={logout} className="h-10 w-full rounded-[10px] border border-black/15 bg-white text-sm font-bold hover:border-ink">Logout</button>
+              </>
             ) : (
               <Link href="/login" className="block h-10 w-full rounded-[10px] border border-black/15 bg-white text-center text-sm font-bold leading-10 hover:border-ink">Login</Link>
             )}

@@ -9,7 +9,8 @@ import { useStore } from "@/lib/store";
 import type { CatalogProduct } from "@/types/database.types";
 
 export function ProductCard({ product }: { product: CatalogProduct }) {
-  const { addToCart } = useStore();
+  const { addToCart, decrementCartItem, cart } = useStore();
+  const qty = cart.find((l) => l.product.id === product.id)?.quantity ?? 0;
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-black/[.07] bg-white shadow-card">
       <Link href={`/catalog/${product.id}`} className="relative block aspect-square overflow-hidden bg-black/[.04]">
@@ -41,9 +42,29 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
             <div className="text-lg font-extrabold text-ink">{formatIDR(product.final_price_idr)}</div>
             <div className="text-[11px] text-faint">all-in, incl. jastip fee</div>
           </div>
-          <Button variant="subtle" className="h-9 px-3" onClick={() => addToCart(product)} aria-label="Add to cart">
-            <Icon name="plus" size={16} />
-          </Button>
+          {qty === 0 ? (
+            <Button variant="subtle" className="h-9 px-3" onClick={() => addToCart(product)} aria-label="Add to cart">
+              <Icon name="plus" size={16} />
+            </Button>
+          ) : (
+            <div className="flex h-9 items-center gap-2.5 rounded-lg bg-brand-50 px-1">
+              <button
+                onClick={() => decrementCartItem(product.id)}
+                aria-label="Decrease quantity"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-lg font-bold text-brand-700 hover:bg-white"
+              >
+                −
+              </button>
+              <span className="min-w-[1ch] text-center text-sm font-extrabold text-brand-700">{qty}</span>
+              <button
+                onClick={() => addToCart(product)}
+                aria-label="Increase quantity"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-lg font-bold text-brand-700 hover:bg-white"
+              >
+                +
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

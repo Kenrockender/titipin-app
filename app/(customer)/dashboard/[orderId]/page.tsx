@@ -48,15 +48,17 @@ export default function OrderDetail() {
       </div>
 
       {/* Timeline */}
-      <Card className="mb-5 p-5">
-        <div className="flex flex-wrap gap-y-4">
+      <Card className="mb-5 overflow-x-auto p-5">
+        <div className="relative flex min-w-[560px] items-start justify-between">
+          <div className="absolute left-0 right-0 top-3.5 h-0.5 -translate-y-1/2 bg-black/[.08]" />
+          <div
+            className="absolute left-0 top-3.5 h-0.5 -translate-y-1/2 bg-brand transition-all"
+            style={{ width: `${(stepIdx / (TIMELINE.length - 1)) * 100}%` }}
+          />
           {TIMELINE.map((step, i) => (
-            <div key={step} className="flex min-w-[110px] flex-1 items-center">
-              <div className="flex flex-col items-center gap-1">
-                <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${i <= stepIdx ? "bg-brand text-white" : "bg-black/[.07] text-faint"}`}>{i < stepIdx ? "✓" : i + 1}</span>
-                <span className={`text-center text-[11px] font-semibold ${i <= stepIdx ? "text-ink" : "text-faint"}`}>{step}</span>
-              </div>
-              {i < TIMELINE.length - 1 && <div className={`mx-1 h-0.5 flex-1 ${i < stepIdx ? "bg-brand" : "bg-black/[.08]"}`} />}
+            <div key={step} className="relative z-10 flex w-0 flex-1 flex-col items-center gap-1.5">
+              <span className={`flex h-7 w-7 flex-none items-center justify-center rounded-full text-xs font-bold ${i <= stepIdx ? "bg-brand text-white" : "bg-black/[.07] text-faint"}`}>{i < stepIdx ? "✓" : i + 1}</span>
+              <span className={`text-center text-[11px] font-semibold leading-tight ${i <= stepIdx ? "text-ink" : "text-faint"}`}>{step}</span>
             </div>
           ))}
         </div>

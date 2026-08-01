@@ -20,6 +20,7 @@ export interface User {
   id: string;
   full_name: string;
   email: string;
+  photo_url?: string | null;
   whatsapp_number: string;
   shipping_address: string;
   store_credit_balance: number;

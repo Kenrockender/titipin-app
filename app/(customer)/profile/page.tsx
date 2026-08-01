@@ -6,7 +6,6 @@ import { useStore } from "@/lib/store";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { formatIDR } from "@/lib/format";
 
 export default function ProfilePage() {
   return (
@@ -43,19 +42,17 @@ function ProfileForm() {
       <h1 className="mb-6 text-3xl font-extrabold tracking-tight">Profile</h1>
       <Card className="mb-4 flex items-center justify-between p-5">
         <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-lg font-extrabold text-brand-700">{currentUser.full_name[0]}</span>
+          {currentUser.photo_url ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={currentUser.photo_url} alt={currentUser.full_name} className="h-12 w-12 rounded-full object-cover" referrerPolicy="no-referrer" />
+          ) : (
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-lg font-extrabold text-brand-700">{currentUser.full_name[0]}</span>
+          )}
           <div>
             <div className="font-bold">{currentUser.full_name}</div>
             <div className="text-sm text-muted">{currentUser.email}</div>
           </div>
         </div>
-      </Card>
-      <Card className="mb-4 flex items-center justify-between bg-gradient-to-r from-brand-50 to-white p-5">
-        <div>
-          <div className="text-sm font-bold text-muted">Store Credit / Wallet</div>
-          <div className="text-2xl font-extrabold text-brand-700">{formatIDR(currentUser.store_credit_balance)}</div>
-        </div>
-        <Icon name="wallet" size={30} className="text-brand" />
       </Card>
       <Card className="p-5">
         {needsAddress && (

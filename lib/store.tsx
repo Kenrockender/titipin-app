@@ -14,6 +14,7 @@ import * as seed from "@/lib/mock-data";
 import { auth, db, googleProvider } from "@/lib/firebase/client";
 import { notifyTelegram } from "@/lib/telegram";
 import { formatIDR, shortId } from "@/lib/format";
+import { BANK_ACCOUNT_INFO } from "@/lib/constants";
 
 export interface CartLine { product: CatalogProduct; quantity: number; }
 
@@ -40,6 +41,7 @@ interface StoreActions {
   updateProfile: (patch: Partial<Pick<User, "full_name" | "whatsapp_number" | "shipping_address">>) => void;
   addToCart: (product: CatalogProduct, quantity?: number) => void;
   removeFromCart: (productId: string) => void;
+  decrementCartItem: (productId: string) => void;
   clearCart: () => void;
   submitRequest: (r: Partial<CustomRequest>) => string;
   placeOrder: (opts: { addonIds: string[]; dpRatio: number; deliveryMethod: DeliveryMethod }) => string;
@@ -57,6 +59,7 @@ interface StoreActions {
 const Ctx = createContext<(StoreState & StoreActions) | null>(null);
 
 const uid = (p: string) => `${p}-${Math.random().toString(36).slice(2, 8)}`;
+const CART_STORAGE_KEY = "titipin-cart";
 
 // Admin email. Configurable via NEXT_PUBLIC_ADMIN_EMAIL; falls back to the brand address.
 export const ADMIN_EMAIL = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@titipin.id").toLowerCase();
@@ -73,6 +76,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>(seed.orders);
   const [pricing, setPricing] = useState<PricingConfig>(DEFAULT_PRICING);
   const [cart, setCart] = useState<CartLine[]>([]);
+  const [cartHydrated, setCartHydrated] = useState(false);
+
+  // Persist the cart in localStorage so it survives refreshes/navigation
+  // (e.g. the login/profile round-trip during checkout).
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+      if (raw) setCart(JSON.parse(raw));
+    } catch { /* ignore corrupt storage */ }
+    setCartHydrated(true);
+  }, []);
+  useEffect(() => {
+    if (!cartHydrated) return;
+    try { window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); } catch { /* ignore quota errors */ }
+  }, [cart, cartHydrated]);
 
   // Google sign-in via Firebase Auth. On sign-in, load (or create) the user's
   // profile document in Firestore so their address/whatsapp/store credit persist.
@@ -90,19 +108,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const snap = await getDoc(ref);
       let profile: User;
       if (snap.exists()) {
-        profile = snap.data() as User;
+        profile = { ...(snap.data() as User), photo_url: fbUser.photoURL };
       } else {
         profile = {
           id: fbUser.uid,
           full_name: fbUser.displayName || fbUser.email || "Customer",
           email: fbUser.email || "",
+          photo_url: fbUser.photoURL,
           whatsapp_number: "",
           shipping_address: "",
           store_credit_balance: 0,
           created_at: new Date().toISOString()
         };
-        await setDoc(ref, profile);
       }
+      await setDoc(ref, profile, { merge: true });
       setCurrentUser(profile);
       setIsAdmin(isAdminEmail(profile.email));
       setAuthLoading(false);
@@ -139,6 +158,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
   const removeFromCart = useCallback((id: string) => setCart((c) => c.filter((l) => l.product.id !== id)), []);
+  const decrementCartItem = useCallback((productId: string) => {
+    setCart((c) => {
+      const found = c.find((l) => l.product.id === productId);
+      if (!found) return c;
+      if (found.quantity <= 1) return c.filter((l) => l.product.id !== productId);
+      return c.map((l) => l.product.id === productId ? { ...l, quantity: l.quantity - 1 } : l);
+    });
+  }, []);
   const clearCart = useCallback(() => setCart([]), []);
 
   const submitRequest = useCallback<StoreActions["submitRequest"]>((r) => {
@@ -198,7 +225,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const markPayment = useCallback<StoreActions["markPayment"]>((orderId, type) => {
     setOrders((os) => os.map((o) => o.id === orderId
       ? { ...o, status: type === "Down Payment" ? "DP Paid" : "Completed" } : o));
-  }, []);
+    const order = orders.find((o) => o.id === orderId);
+    if (order) {
+      const amount = type === "Down Payment"
+        ? order.total_dp_required_idr
+        : order.total_price_idr - order.total_dp_required_idr + (order.local_shipping_fee_idr ?? 0);
+      notifyTelegram(
+        `💸 ${order.customer_name} bilang sudah transfer ${type === "Down Payment" ? "DP" : "pelunasan"} untuk order #${shortId(order.id)}\n` +
+        `Jumlah: ${formatIDR(amount)}\n\n` +
+        `Tolong cek mutasi rekening ${BANK_ACCOUNT_INFO}, lalu verifikasi di admin panel.`
+      );
+    }
+  }, [orders]);
 
   const quoteRequest = useCallback<StoreActions["quoteRequest"]>((id, quotedIdr, dpIdr) => {
     setRequests((rs) => rs.map((r) => r.id === id
@@ -241,11 +279,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({
     currentUser, isAdmin, authLoading, trips: seed.trips, products, requests, orders, addOns: seed.addOns, pricing, cart, hauls: seed.hauls, heroHauls: seed.heroHauls,
-    signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, clearCart, submitRequest,
+    signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, decrementCartItem, clearCart, submitRequest,
     placeOrder, markPayment, quoteRequest, setRequestStatus, setItemStatus, setOrderStatus,
     refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing
   }), [currentUser, isAdmin, authLoading, products, requests, orders, pricing, cart,
-    signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, clearCart, submitRequest,
+    signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, decrementCartItem, clearCart, submitRequest,
     placeOrder, markPayment, quoteRequest, setRequestStatus, setItemStatus, setOrderStatus,
     refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing]);
 
