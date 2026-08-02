@@ -1,3 +1,3 @@
-// Update this once you share your real BCA account — used in customer-facing
-// payment instructions and in the admin's prefilled WhatsApp messages.
-export const BANK_ACCOUNT_INFO = "BCA 7615588644 a/n Kenneth Flynn Gunawan";
+// Set via NEXT_PUBLIC_BANK_ACCOUNT_INFO — used in customer-facing payment
+// instructions and in the admin's prefilled WhatsApp messages.
+export const BANK_ACCOUNT_INFO = process.env.NEXT_PUBLIC_BANK_ACCOUNT_INFO || "Bank transfer (set NEXT_PUBLIC_BANK_ACCOUNT_INFO)";

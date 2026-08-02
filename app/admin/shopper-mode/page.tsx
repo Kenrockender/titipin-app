@@ -61,7 +61,7 @@ export default function ShopperMode() {
                 {items.map((it) => (
                   <div key={it.id} className="flex items-center gap-3 p-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={it.image_url} alt="" className="h-14 w-14 flex-none rounded-lg object-cover" />
+                    <img src={it.image_url} alt={it.item_name} className="h-14 w-14 flex-none rounded-lg object-cover" />
                     <div className="min-w-0 flex-1">
                       <div className="font-bold leading-tight">{it.item_name}</div>
                       <div className="text-xs text-muted">Qty {it.quantity} · #{it.orderShort} · {formatIDR(it.locked_price_idr)}</div>
@@ -86,6 +86,7 @@ export default function ShopperMode() {
 
 function StatusButtons({ item, customerWhatsapp, onSecure, onOOS }: { item: OrderItem; customerWhatsapp: string; onSecure: () => void; onOOS: () => void }) {
   if (item.item_status === "Secured") return <Badge tone="green"><Icon name="check" size={13} /> Secured</Badge>;
+  if (item.item_status === "Refunded as Credit") return <Badge tone="purple">Refunded as Credit</Badge>;
   if (item.item_status === "Out of Stock") return (
     <div className="flex flex-col items-end gap-1">
       <Badge tone="red">Out of Stock</Badge>

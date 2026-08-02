@@ -12,13 +12,22 @@ import { formatIDR, formatDate, shortId } from "@/lib/format";
 export default function DashboardPage() {
   const { currentUser, orders, requests, acceptQuote } = useStore();
   const router = useRouter();
+  const [acceptingId, setAcceptingId] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
   if (!currentUser) return <NeedLogin />;
   const myOrders = orders.filter((o) => o.user_id === currentUser.id);
   const myRequests = requests.filter((r) => r.user_id === currentUser.id);
 
-  const accept = (requestId: string) => {
-    const orderId = acceptQuote(requestId);
-    router.push(`/dashboard/${orderId}`);
+  const accept = async (requestId: string) => {
+    setError(null);
+    setAcceptingId(requestId);
+    try {
+      const orderId = await acceptQuote(requestId);
+      router.push(`/dashboard/${orderId}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't accept this quote.");
+      setAcceptingId(null);
+    }
   };
 
   return (
@@ -44,7 +53,7 @@ export default function DashboardPage() {
                 <div className="flex flex-none -space-x-3">
                   {o.items.slice(0, 3).map((it) => (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img key={it.id} src={it.image_url} alt="" className="h-11 w-11 flex-none rounded-lg border-2 border-surface object-cover" />
+                    <img key={it.id} src={it.image_url} alt={it.item_name} className="h-11 w-11 flex-none rounded-lg border-2 border-surface object-cover" />
                   ))}
                 </div>
                 <div className="min-w-0">
@@ -71,7 +80,7 @@ export default function DashboardPage() {
           <Card key={r.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
             <div className="flex min-w-0 items-center gap-3">
               {r.uploaded_image_urls?.[0] && /* eslint-disable-next-line @next/next/no-img-element */ (
-                <img src={r.uploaded_image_urls[0]} alt="" className="h-12 w-12 flex-none rounded-lg object-cover" />
+                <img src={r.uploaded_image_urls[0]} alt={r.product_name_or_desc} className="h-12 w-12 flex-none rounded-lg object-cover" />
               )}
               <div className="min-w-0">
                 <div className="truncate font-bold">{r.product_name_or_desc}</div>
@@ -82,11 +91,14 @@ export default function DashboardPage() {
               <StatusBadge status={r.status} />
               {r.quoted_price_idr && <div className="text-sm">Quote: <b>{formatIDR(r.quoted_price_idr)}</b></div>}
               {r.status === "Quote Sent" && (
-                <Button className="h-9" onClick={() => accept(r.id)}>Accept & Pay DP →</Button>
+                <Button className="h-9" onClick={() => accept(r.id)} disabled={acceptingId === r.id}>
+                  {acceptingId === r.id ? "Accepting…" : "Accept & Pay DP →"}
+                </Button>
               )}
             </div>
           </Card>
         ))}
+        {error && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{error}</p>}
       </div>
     </main>
   );

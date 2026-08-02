@@ -23,7 +23,7 @@ export default function AdminRequests() {
           <Card key={r.id} className="p-4">
             <div className="flex flex-wrap items-start gap-4">
               {r.uploaded_image_urls?.[0] && /* eslint-disable-next-line @next/next/no-img-element */ (
-                <img src={r.uploaded_image_urls[0]} alt="" className="h-20 w-20 flex-none rounded-lg object-cover" />
+                <img src={r.uploaded_image_urls[0]} alt={r.product_name_or_desc} className="h-20 w-20 flex-none rounded-lg object-cover" />
               )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">

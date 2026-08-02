@@ -16,7 +16,7 @@ const NEXT: Partial<Record<OrderStatus, OrderStatus>> = {
 };
 
 export default function AdminOrders() {
-  const { orders, setOrderStatus } = useStore();
+  const { orders, payments, setOrderStatus, verifyPayment } = useStore();
   const [open, setOpen] = useState<string | null>(orders[0]?.id ?? null);
 
   return (
@@ -30,7 +30,7 @@ export default function AdminOrders() {
               <div className="flex min-w-0 items-center gap-3">
                 <div className="flex flex-none -space-x-3">
                   {o.items.slice(0, 3).map((it) => /* eslint-disable-next-line @next/next/no-img-element */ (
-                    <img key={it.id} src={it.image_url} alt="" className="h-10 w-10 flex-none rounded-lg border-2 border-surface object-cover" />
+                    <img key={it.id} src={it.image_url} alt={it.item_name} className="h-10 w-10 flex-none rounded-lg border-2 border-surface object-cover" />
                   ))}
                 </div>
                 <div className="min-w-0">
@@ -49,6 +49,30 @@ export default function AdminOrders() {
             </button>
             {open === o.id && (
               <div className="mt-4 border-t border-edge/[.06] pt-4">
+                {(() => {
+                  const pending = payments.find((p) => p.order_id === o.id && p.status === "Pending Verification");
+                  if (!pending) return null;
+                  const nextStatus = NEXT[o.status];
+                  return (
+                    <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 p-3">
+                      {pending.receipt_image_url && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <a href={pending.receipt_image_url} target="_blank" rel="noreferrer">
+                          <img src={pending.receipt_image_url} alt="Payment receipt" className="h-14 w-14 flex-none rounded-lg object-cover" />
+                        </a>
+                      )}
+                      <div className="min-w-0 flex-1 text-sm">
+                        <div className="font-bold text-amber-800 dark:text-amber-400">{pending.payment_type} claimed — {formatIDR(pending.amount_idr)}</div>
+                        <div className="text-xs text-amber-800/70 dark:text-amber-400/70">Check the bank mutation before verifying.</div>
+                      </div>
+                      {nextStatus && (
+                        <Button className="h-9 flex-none" onClick={() => verifyPayment(pending.id, o.id, nextStatus)}>
+                          <Icon name="badge-check" size={15} color="#fff" /> Verify & Advance → {nextStatus}
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <div className="mb-2 text-sm font-bold">Line items</div>
@@ -65,7 +89,7 @@ export default function AdminOrders() {
                     <Row label="DP required" value={formatIDR(o.total_dp_required_idr)} />
                     <Row label="Balance" value={formatIDR(o.total_price_idr - o.total_dp_required_idr)} />
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {NEXT[o.status] && <Button className="h-9" onClick={() => setOrderStatus(o.id, NEXT[o.status]!)}>Advance → {NEXT[o.status]}</Button>}
+                      {NEXT[o.status] && <Button variant="outline" className="h-9" onClick={() => setOrderStatus(o.id, NEXT[o.status]!)}>Advance → {NEXT[o.status]}</Button>}
                       {o.status !== "Cancelled" && o.status !== "Completed" && <Button variant="outline" className="h-9" onClick={() => setOrderStatus(o.id, "Cancelled")}>Cancel</Button>}
                       {o.customer_whatsapp && (
                         <a href={waLinkTo(o.customer_whatsapp, waMessage(o))} target="_blank" rel="noreferrer">

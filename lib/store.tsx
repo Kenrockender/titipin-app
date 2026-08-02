@@ -8,7 +8,7 @@ import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut } from 
 import { collection, doc, getDoc, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
 import type {
   AddOn, CatalogProduct, CustomRequest, DeliveryMethod, ItemStatus, Order, OrderItem,
-  OrderStatus, PricingConfig, RequestStatus, Trip, User
+  OrderStatus, Payment, PricingConfig, RequestStatus, Trip, User
 } from "@/types/database.types";
 import { DEFAULT_PRICING, calculateDP } from "@/lib/pricing";
 import * as seed from "@/lib/mock-data";
@@ -28,6 +28,7 @@ interface StoreState {
   requests: CustomRequest[];
   orders: Order[];
   addOns: AddOn[];
+  payments: Payment[];
   pricing: PricingConfig;
   cart: CartLine[];
   hauls: HaulImage[];
@@ -45,14 +46,15 @@ interface StoreActions {
   decrementCartItem: (productId: string) => void;
   clearCart: () => void;
   submitRequest: (r: Partial<CustomRequest>) => string;
-  placeOrder: (opts: { addonIds: string[]; dpRatio: number; deliveryMethod: DeliveryMethod }) => string;
-  markPayment: (orderId: string, type: "Down Payment" | "Final Payment") => void;
+  placeOrder: (opts: { addonIds: string[]; dpRatio: number; deliveryMethod: DeliveryMethod }) => Promise<string>;
+  submitPayment: (orderId: string, type: "Down Payment" | "Final Payment", receiptUrl: string) => Promise<void>;
   quoteRequest: (id: string, quotedIdr: number, dpIdr: number) => void;
-  acceptQuote: (requestId: string) => string;
+  acceptQuote: (requestId: string) => Promise<string>;
   setRequestStatus: (id: string, status: RequestStatus) => void;
   setItemStatus: (orderId: string, itemId: string, status: ItemStatus) => void;
   setOrderStatus: (orderId: string, status: OrderStatus) => void;
-  refundAsStoreCredit: (orderId: string, itemId: string) => void;
+  refundAsStoreCredit: (orderId: string, itemId: string) => Promise<void>;
+  verifyPayment: (paymentId: string, orderId: string, nextStatus: OrderStatus) => void;
   upsertProduct: (p: CatalogProduct) => void;
   toggleProductActive: (id: string) => void;
   updatePricing: (p: PricingConfig) => void;
@@ -68,6 +70,22 @@ const CART_STORAGE_KEY = "titipin-cart";
 export const ADMIN_EMAIL = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@titipin.id").toLowerCase();
 export function isAdminEmail(email: string) {
   return email.trim().toLowerCase() === ADMIN_EMAIL;
+}
+
+// Calls a trusted server API route (order pricing, payment, store-credit) with
+// the signed-in user's Firebase ID token, so the server can verify who's
+// asking instead of trusting whatever the client claims.
+async function callApi<T>(path: string, body: unknown): Promise<T> {
+  if (!auth?.currentUser) throw new Error("You need to be signed in to do that.");
+  const token = await auth.currentUser.getIdToken();
+  const res = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Request failed");
+  return data as T;
 }
 
 // Subscribes to a Firestore collection and mirrors it into local state; falls
@@ -128,9 +146,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [addOns] = useFirestoreCollection<AddOn>("addOns", seed.addOns);
   const [requests, setRequestsFallback] = useOwnedCollection<CustomRequest>("requests", seed.requests, currentUser, isAdmin, authLoading);
   const [orders, setOrdersFallback] = useOwnedCollection<Order>("orders", seed.orders, currentUser, isAdmin, authLoading);
+  const [payments, setPaymentsFallback] = useOwnedCollection<Payment>("payments", seed.payments, currentUser, isAdmin, authLoading);
   const [pricing, setPricingFallback] = useFirestoreDoc<PricingConfig>(["config", "pricing"], DEFAULT_PRICING);
   const [cart, setCart] = useState<CartLine[]>([]);
   const [cartHydrated, setCartHydrated] = useState(false);
+
+  // The cart stores a product snapshot per line (for offline/instant display),
+  // but prices must always reflect the live catalog — otherwise a customer's
+  // cart keeps charging a stale price after the admin changes markup/FX/price.
+  // Every external read of the cart goes through this re-hydrated version.
+  const liveCart = useMemo(() => cart.map((l) => {
+    const live = products.find((p) => p.id === l.product.id);
+    return live ? { ...l, product: live } : l;
+  }), [cart, products]);
 
   // Persist the cart in localStorage so it survives refreshes/navigation
   // (e.g. the login/profile round-trip during checkout).
@@ -198,9 +226,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = useCallback<StoreActions["updateProfile"]>((patch) => {
     setCurrentUser((u) => {
       if (!u) return u;
-      const updated = { ...u, ...patch };
-      if (db) setDoc(doc(db, "users", updated.id), updated, { merge: true }).catch(() => {});
-      return updated;
+      // Write only the changed fields — never re-send the full local snapshot,
+      // which could clobber a server-computed field (like store_credit_balance)
+      // with a stale value if it changed elsewhere in this session.
+      if (db) updateDoc(doc(db, "users", u.id), patch).catch(() => {});
+      return { ...u, ...patch };
     });
   }, []);
 
@@ -247,9 +277,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return id;
   }, [currentUser]);
 
-  const placeOrder = useCallback<StoreActions["placeOrder"]>(({ addonIds, dpRatio, deliveryMethod }) => {
+  // When Firebase is configured, order creation is delegated to a server API
+  // route that re-prices everything from the live catalog — the client only
+  // ever says *what* it wants, never *how much* it costs. In mock mode there's
+  // no backend to trust, so pricing happens locally like before.
+  const placeOrder = useCallback<StoreActions["placeOrder"]>(async ({ addonIds, dpRatio, deliveryMethod }) => {
+    if (db) {
+      const { orderId } = await callApi<{ orderId: string }>("/api/orders/place", {
+        items: liveCart.map((l) => ({ productId: l.product.id, quantity: l.quantity })),
+        addonIds, dpRatio, deliveryMethod
+      });
+      setCart([]);
+      return orderId;
+    }
     const id = uid("order");
-    const items: OrderItem[] = cart.map((l) => ({
+    const items: OrderItem[] = liveCart.map((l) => ({
       id: uid("oi"), order_id: id, product_id: l.product.id, request_id: null,
       item_name: l.product.name, quantity: l.quantity, locked_price_idr: l.product.final_price_idr,
       store_location: l.product.store_location ?? "TBD", item_status: "Pending Purchase",
@@ -266,8 +308,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       local_shipping_fee_idr: null, delivery_method: deliveryMethod, status: "Waiting DP",
       created_at: new Date().toISOString(), items, addon_ids: addonIds
     };
-    if (db) setDoc(doc(db, "orders", id), order).catch(() => {});
-    else setOrdersFallback((os) => [order, ...os]);
+    setOrdersFallback((os) => [order, ...os]);
     setCart([]);
     notifyTelegram(
       `🛒 Order baru #${shortId(id)} dari ${currentUser?.full_name ?? "Guest"} (${currentUser?.email ?? "-"})\n` +
@@ -276,13 +317,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       `Delivery: ${deliveryMethod}`
     );
     return id;
-  }, [cart, currentUser, products, addOns]);
+  }, [liveCart, currentUser, products, addOns]);
 
-  const markPayment = useCallback<StoreActions["markPayment"]>((orderId, type) => {
+  // Customer claims a payment. This only records a pending-verification
+  // Payment doc via the server (or, in mock mode, flips status locally) — it
+  // never lets the client itself flip the order to "paid".
+  const submitPayment = useCallback<StoreActions["submitPayment"]>(async (orderId, type, receiptUrl) => {
+    if (db) {
+      await callApi(`/api/orders/${orderId}/payment`, { type, receiptUrl });
+      return;
+    }
     const order = orders.find((o) => o.id === orderId);
     const newStatus: OrderStatus = type === "Down Payment" ? "DP Paid" : "Completed";
-    if (db) updateDoc(doc(db, "orders", orderId), { status: newStatus }).catch(() => {});
-    else setOrdersFallback((os) => os.map((o) => o.id === orderId ? { ...o, status: newStatus } : o));
+    setOrdersFallback((os) => os.map((o) => o.id === orderId ? { ...o, status: newStatus } : o));
     if (order) {
       const amount = type === "Down Payment"
         ? order.total_dp_required_idr
@@ -302,8 +349,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Turns a quoted custom request into a real Order, so it goes through the
-  // same DP -> receipt-upload -> pipeline flow as a catalog order.
-  const acceptQuote = useCallback<StoreActions["acceptQuote"]>((requestId) => {
+  // same DP -> receipt-upload -> pipeline flow as a catalog order. When
+  // Firebase is configured this is delegated server-side so the price used is
+  // always whatever the admin actually quoted, never something the client sends.
+  const acceptQuote = useCallback<StoreActions["acceptQuote"]>(async (requestId) => {
+    if (db) {
+      const { orderId } = await callApi<{ orderId: string }>(`/api/requests/${requestId}/accept`, {});
+      return orderId;
+    }
     const req = requests.find((r) => r.id === requestId);
     if (!req || req.quoted_price_idr == null || req.required_dp_idr == null) {
       throw new Error("This request doesn't have a quote yet");
@@ -323,13 +376,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       local_shipping_fee_idr: null, delivery_method: "Pickup", status: "Waiting DP",
       created_at: new Date().toISOString(), items: [item], addon_ids: []
     };
-    if (db) {
-      setDoc(doc(db, "orders", orderId), order).catch(() => {});
-      updateDoc(doc(db, "requests", requestId), { status: "Accepted" }).catch(() => {});
-    } else {
-      setOrdersFallback((os) => [order, ...os]);
-      setRequestsFallback((rs) => rs.map((r) => r.id === requestId ? { ...r, status: "Accepted" } : r));
-    }
+    setOrdersFallback((os) => [order, ...os]);
+    setRequestsFallback((rs) => rs.map((r) => r.id === requestId ? { ...r, status: "Accepted" } : r));
     notifyTelegram(
       `✅ ${req.customer_name} terima quote buat "${req.product_name_or_desc}"\n` +
       `Order baru #${shortId(orderId)} otomatis dibuat — Total: ${formatIDR(req.quoted_price_idr)} · DP: ${formatIDR(req.required_dp_idr)}`
@@ -355,21 +403,36 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     else setOrdersFallback((os) => os.map((o) => o.id === orderId ? { ...o, status } : o));
   }, []);
 
-  const refundAsStoreCredit = useCallback<StoreActions["refundAsStoreCredit"]>((orderId, itemId) => {
+  // Converts an out-of-stock item into store credit. Runs as a server-side
+  // transaction when Firebase is configured (validates the item is actually
+  // out of stock and credits the exact locked price) so a customer can't
+  // self-grant credit by writing to their own user doc directly.
+  const refundAsStoreCredit = useCallback<StoreActions["refundAsStoreCredit"]>(async (orderId, itemId) => {
+    if (db) {
+      const { newBalance } = await callApi<{ newBalance: number }>(`/api/orders/${orderId}/store-credit`, { itemId });
+      setCurrentUser((u) => u ? { ...u, store_credit_balance: newBalance } : u);
+      return;
+    }
     const order = orders.find((o) => o.id === orderId);
     const item = order?.items.find((i) => i.id === itemId);
     if (!order || !item) return;
-    const items = order.items.map((i) => i.id === itemId ? { ...i, item_status: "Out of Stock" as ItemStatus } : i);
-    if (db) updateDoc(doc(db, "orders", orderId), { items }).catch(() => {});
-    else setOrdersFallback((os) => os.map((o) => o.id === orderId ? { ...o, items } : o));
-
-    setCurrentUser((u) => {
-      if (!u) return u;
-      const updated = { ...u, store_credit_balance: u.store_credit_balance + item.locked_price_idr * item.quantity };
-      if (db) setDoc(doc(db, "users", updated.id), updated, { merge: true }).catch(() => {});
-      return updated;
-    });
+    const items = order.items.map((i) => i.id === itemId ? { ...i, item_status: "Refunded as Credit" as ItemStatus } : i);
+    setOrdersFallback((os) => os.map((o) => o.id === orderId ? { ...o, items } : o));
+    setCurrentUser((u) => u ? { ...u, store_credit_balance: u.store_credit_balance + item.locked_price_idr * item.quantity } : u);
   }, [orders]);
+
+  // Admin-only: marks a claimed payment as verified and advances the order.
+  // Safe as a direct client write — Firestore rules check the caller's
+  // server-verified auth token email, which the client can't forge.
+  const verifyPayment = useCallback<StoreActions["verifyPayment"]>((paymentId, orderId, nextStatus) => {
+    if (db) {
+      updateDoc(doc(db, "payments", paymentId), { status: "Verified" }).catch(() => {});
+      updateDoc(doc(db, "orders", orderId), { status: nextStatus }).catch(() => {});
+    } else {
+      setPaymentsFallback((ps) => ps.map((p) => p.id === paymentId ? { ...p, status: "Verified" } : p));
+      setOrdersFallback((os) => os.map((o) => o.id === orderId ? { ...o, status: nextStatus } : o));
+    }
+  }, []);
 
   const upsertProduct = useCallback<StoreActions["upsertProduct"]>((p) => {
     if (db) setDoc(doc(db, "products", p.id), p).catch(() => {});
@@ -391,14 +454,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(() => ({
-    currentUser, isAdmin, authLoading, trips, products, requests, orders, addOns, pricing, cart, hauls: seed.hauls, heroHauls: seed.heroHauls,
+    currentUser, isAdmin, authLoading, trips, products, requests, orders, addOns, payments, pricing, cart: liveCart, hauls: seed.hauls, heroHauls: seed.heroHauls,
     signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, decrementCartItem, clearCart, submitRequest,
-    placeOrder, markPayment, quoteRequest, acceptQuote, setRequestStatus, setItemStatus, setOrderStatus,
-    refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing, updateTripRate
-  }), [currentUser, isAdmin, authLoading, trips, products, requests, orders, addOns, pricing, cart,
+    placeOrder, submitPayment, quoteRequest, acceptQuote, setRequestStatus, setItemStatus, setOrderStatus,
+    refundAsStoreCredit, verifyPayment, upsertProduct, toggleProductActive, updatePricing, updateTripRate
+  }), [currentUser, isAdmin, authLoading, trips, products, requests, orders, addOns, payments, pricing, liveCart,
     signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, decrementCartItem, clearCart, submitRequest,
-    placeOrder, markPayment, quoteRequest, acceptQuote, setRequestStatus, setItemStatus, setOrderStatus,
-    refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing, updateTripRate]);
+    placeOrder, submitPayment, quoteRequest, acceptQuote, setRequestStatus, setItemStatus, setOrderStatus,
+    refundAsStoreCredit, verifyPayment, upsertProduct, toggleProductActive, updatePricing, updateTripRate]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

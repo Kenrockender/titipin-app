@@ -141,8 +141,8 @@ export const orders: Order[] = [
 ];
 
 export const payments: Payment[] = [
-  { id: "pay-1", order_id: "order-5001", payment_type: "Down Payment", amount_idr: 342000, payment_method: "BCA Transfer", receipt_image_url: null, status: "Verified", created_at: "2026-07-06T09:00:00Z" },
-  { id: "pay-2", order_id: "order-5003", payment_type: "Down Payment", amount_idr: 483000, payment_method: "QRIS", receipt_image_url: null, status: "Verified", created_at: "2026-06-20T06:30:00Z" }
+  { id: "pay-1", order_id: "order-5001", user_id: "user-001", payment_type: "Down Payment", amount_idr: 342000, payment_method: "BCA Transfer", receipt_image_url: null, status: "Verified", created_at: "2026-07-06T09:00:00Z" },
+  { id: "pay-2", order_id: "order-5003", user_id: "user-001", payment_type: "Down Payment", amount_idr: 483000, payment_method: "QRIS", receipt_image_url: null, status: "Verified", created_at: "2026-06-20T06:30:00Z" }
 ];
 
 // Local AI-generated haul photos (drop files into public/hauls/).

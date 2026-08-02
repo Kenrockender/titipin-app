@@ -4,10 +4,24 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null && request.auth.token.email == 'kenrockender521@gmail.com';
     }
+    function isOwner(field) {
+      return request.auth != null && resource.data[field] == request.auth.uid;
+    }
 
-    // Each signed-in user can read/write only their own profile doc.
+    // Each signed-in user can read their own profile. They may only ever
+    // write a fixed set of self-service fields (name/whatsapp/address/photo)
+    // directly — money fields like store_credit_balance are only ever
+    // written by trusted server routes (via the Admin SDK, which bypasses
+    // these rules) or by the admin, never by the client SDK.
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+      allow create: if request.auth != null && request.auth.uid == userId
+        && request.resource.data.store_credit_balance == 0;
+      allow update: if isAdmin() || (
+        request.auth != null && request.auth.uid == userId &&
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['full_name', 'whatsapp_number', 'shipping_address', 'photo_url'])
+      );
     }
 
     // Catalog data is public read-only from the client; only the admin can edit it.
@@ -28,26 +42,36 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Custom requests: anyone (incl. guests) can submit one; only the
-    // requester or the admin can read it. The admin quotes/rejects it; the
-    // requester can accept a quote (status -> Accepted, which spawns an Order).
+    // Custom requests: anyone (incl. guests) can submit one, but only in its
+    // initial, unquoted state — a requester can't self-quote a price. Only
+    // the requester or the admin can read it. The admin quotes/rejects it
+    // (client write, gated by isAdmin()); the requester accepts a quote via
+    // the /api/requests/[id]/accept server route, which uses the Admin SDK
+    // and bypasses these rules, so no client-side "accept" path is needed here.
     match /requests/{requestId} {
-      allow read: if isAdmin() || (request.auth != null && resource.data.user_id == request.auth.uid);
-      allow create: if true;
-      allow update: if isAdmin() || (request.auth != null && resource.data.user_id == request.auth.uid);
+      allow read: if isAdmin() || isOwner('user_id');
+      allow create: if request.resource.data.status == 'Pending Review'
+        && request.resource.data.quoted_price_idr == null
+        && request.resource.data.required_dp_idr == null;
+      allow update: if isAdmin();
     }
 
-    // Orders: must be signed in to create one for yourself; the owner or the
-    // admin can read/update it (the owner updates payment status, the admin
-    // updates the fulfillment pipeline/item statuses).
+    // Orders: creation and status/pricing updates always go through trusted
+    // server routes (Admin SDK, bypasses these rules) or the admin console
+    // (isAdmin(), verified server-side by Firestore itself from the auth
+    // token). A customer never writes their own order document directly —
+    // that was the hole that let a client forge its own price/status.
     match /orders/{orderId} {
-      allow read: if isAdmin() || (request.auth != null && resource.data.user_id == request.auth.uid);
-      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
-      allow update: if isAdmin() || (request.auth != null && resource.data.user_id == request.auth.uid);
+      allow read: if isAdmin() || isOwner('user_id');
+      allow write: if isAdmin();
     }
 
+    // Payments: created only by the server (Admin SDK) when a customer
+    // claims a payment; the owner can read their own for status display.
+    // Only the admin can write (e.g. marking one "Verified").
     match /payments/{paymentId} {
-      allow read, write: if isAdmin();
+      allow read: if isAdmin() || isOwner('user_id');
+      allow write: if isAdmin();
     }
   }
 }

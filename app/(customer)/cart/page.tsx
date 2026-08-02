@@ -16,6 +16,8 @@ export default function CartPage() {
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [dpRatio, setDpRatio] = useState(0.6);
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("Pickup");
+  const [placing, setPlacing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (cart.length === 0) return (
     <main className="mx-auto max-w-md px-5 py-24 text-center">
@@ -34,11 +36,18 @@ export default function CartPage() {
   const total = itemsTotal + addonTotal;
   const dp = calculateDP(total, dpRatio);
 
-  const checkout = () => {
+  const checkout = async () => {
     if (!currentUser) { router.push("/login?next=/cart"); return; }
     if (!currentUser.shipping_address.trim()) { router.push("/profile?next=/cart&needAddress=1"); return; }
-    const id = placeOrder({ addonIds: selectedAddons, dpRatio, deliveryMethod });
-    router.push(`/dashboard/${id}`);
+    setError(null);
+    setPlacing(true);
+    try {
+      const id = await placeOrder({ addonIds: selectedAddons, dpRatio, deliveryMethod });
+      router.push(`/dashboard/${id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't place your order. Please try again.");
+      setPlacing(false);
+    }
   };
 
   return (
@@ -49,7 +58,7 @@ export default function CartPage() {
           {cart.map((l) => (
             <Card key={l.product.id} className="flex items-center gap-4 p-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={l.product.image_url} alt="" className="h-16 w-16 flex-none rounded-lg object-cover" />
+              <img src={l.product.image_url} alt={l.product.name} className="h-16 w-16 flex-none rounded-lg object-cover" />
               <div className="min-w-0 flex-1">
                 <div className="truncate font-bold">{l.product.name}</div>
                 <div className="truncate text-sm text-muted">Qty {l.quantity} · {l.product.store_location}</div>
@@ -113,7 +122,8 @@ export default function CartPage() {
             {currentUser && !currentUser.shipping_address.trim() && (
               <p className="rounded-lg bg-amber-50 dark:bg-amber-500/10 p-2 text-center text-xs font-semibold text-amber-800 dark:text-amber-400">Isi alamat pengiriman di Profile dulu sebelum checkout.</p>
             )}
-            <Button className="h-12" onClick={checkout}>Place Order & Pay DP</Button>
+            {error && <p className="text-center text-xs font-semibold text-red-600 dark:text-red-400">{error}</p>}
+            <Button className="h-12" onClick={checkout} disabled={placing}>{placing ? "Placing order…" : "Place Order & Pay DP"}</Button>
             <p className="text-center text-xs text-faint">Manual transfer / QRIS · upload proof after ordering</p>
           </Card>
         </div>

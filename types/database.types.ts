@@ -11,7 +11,7 @@ export type OrderStatus =
   | "Awaiting Final Payment"
   | "Completed"
   | "Cancelled";
-export type ItemStatus = "Pending Purchase" | "Secured" | "Out of Stock";
+export type ItemStatus = "Pending Purchase" | "Secured" | "Out of Stock" | "Refunded as Credit";
 export type DeliveryMethod = "Pickup" | "GoSend";
 export type PaymentType = "Down Payment" | "Final Payment";
 export type PaymentStatus = "Pending Verification" | "Verified" | "Failed";
@@ -112,6 +112,7 @@ export interface AddOn {
 export interface Payment {
   id: string;
   order_id: string;
+  user_id: string;
   payment_type: PaymentType;
   amount_idr: number;
   payment_method: string;

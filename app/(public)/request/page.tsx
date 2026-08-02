@@ -6,6 +6,14 @@ import { useStore } from "@/lib/store";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { compressImageToDataUrl } from "@/lib/image";
+
+// Firebase Storage isn't available on this project's plan, so reference
+// photos are compressed client-side and embedded as base64 in the request
+// doc — Firestore caps documents at 1MB, so both the count and per-image
+// size need a hard ceiling.
+const MAX_IMAGES = 3;
+const MAX_IMAGE_BYTES = 350_000;
 
 export default function RequestPage() {
   const { submitRequest } = useStore();
@@ -13,25 +21,43 @@ export default function RequestPage() {
   const [form, setForm] = useState({ name: "", url: "", qty: "1", variations: "", expected: "" });
   const [images, setImages] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const onFiles = (files: FileList | null) => {
-    if (!files) return;
-    Array.from(files).forEach((f) => {
-      const reader = new FileReader();
-      reader.onload = () => setImages((p) => [...p, reader.result as string]);
-      reader.readAsDataURL(f);
-    });
+  const onFiles = async (list: FileList | null) => {
+    if (!list) return;
+    const room = Math.max(0, MAX_IMAGES - images.length);
+    const files = Array.from(list).slice(0, room);
+    if (files.length === 0) return;
+    setError(null);
+    try {
+      const compressed = await Promise.all(files.map((f) => compressImageToDataUrl(f)));
+      const tooBig = compressed.some((dataUrl) => dataUrl.length > MAX_IMAGE_BYTES);
+      if (tooBig) { setError("One of those photos is too complex to attach — try a simpler screenshot or crop it tighter."); return; }
+      setImages((p) => [...p, ...compressed]);
+    } catch {
+      setError("Couldn't process that image. Please try a different file.");
+    }
   };
+  const removeImage = (i: number) => setImages((p) => p.filter((_, x) => x !== i));
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim()) return;
-    submitRequest({
-      product_name_or_desc: form.name, product_url: form.url || null,
-      uploaded_image_urls: images.length ? images : null, quantity: Math.max(1, Number(form.qty) || 1),
-      variations: form.variations
-    });
-    setSubmitted(true);
+    if (!form.name.trim() || submitting) return;
+    setError(null);
+    setSubmitting(true);
+    try {
+      submitRequest({
+        product_name_or_desc: form.name, product_url: form.url || null,
+        uploaded_image_urls: images.length ? images : null, quantity: Math.max(1, Number(form.qty) || 1),
+        variations: form.variations
+      });
+      setSubmitted(true);
+    } catch {
+      setError("Couldn't submit your request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) return (
@@ -62,18 +88,20 @@ export default function RequestPage() {
           </Field>
           <div>
             <label className="mb-1.5 block text-sm font-bold">Reference photos / screenshots</label>
-            <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-edge/15 py-8 text-center hover:border-brand">
-              <Icon name="image-plus" size={26} className="text-faint" />
-              <span className="text-sm text-muted">Click to upload multiple images</span>
-              <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files)} />
-            </label>
+            {images.length < MAX_IMAGES && (
+              <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-edge/15 py-8 text-center hover:border-brand">
+                <Icon name="image-plus" size={26} className="text-faint" />
+                <span className="text-sm text-muted">Click to upload up to {MAX_IMAGES} images</span>
+                <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files)} />
+              </label>
+            )}
             {images.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {images.map((src, i) => (
                   <div key={i} className="relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt="" className="h-20 w-20 rounded-lg object-cover" />
-                    <button type="button" onClick={() => setImages(images.filter((_, x) => x !== i))} className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-white"><Icon name="x" size={13} color="#fff" /></button>
+                    <img src={src} alt={`Reference photo ${i + 1}`} className="h-20 w-20 rounded-lg object-cover" />
+                    <button type="button" onClick={() => removeImage(i)} className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-white"><Icon name="x" size={13} color="#fff" /></button>
                   </div>
                 ))}
               </div>
@@ -86,7 +114,8 @@ export default function RequestPage() {
           <Field label="Size / color variations">
             <input value={form.variations} onChange={(e) => setForm({ ...form, variations: e.target.value })} placeholder="e.g. Size M, Color Red" className="input" />
           </Field>
-          <Button type="submit" className="h-12">Submit Request <Icon name="arrow-right" size={17} color="#fff" /></Button>
+          {error && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{error}</p>}
+          <Button type="submit" className="h-12" disabled={submitting}>{submitting ? "Submitting…" : <>Submit Request <Icon name="arrow-right" size={17} color="#fff" /></>}</Button>
         </form>
       </Card>
       <style jsx global>{`
