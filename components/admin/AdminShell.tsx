@@ -100,9 +100,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Mobile top bar */}
+      {/* Mobile top bar — fixed so it stays put while the page scrolls */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-edge/[.07] bg-surface px-4 py-3 md:hidden">
+        <header
+          className="fixed inset-x-0 top-0 z-40 flex items-center gap-3 border-b border-edge/[.07] bg-surface px-4 py-3 md:hidden"
+          style={{ paddingTop: "env(safe-area-inset-top)" }}
+        >
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand"><Icon name="package" size={16} color="#fff" /></span>
           <span className="font-extrabold">Titipin Admin</span>
           <div className="ml-auto flex items-center gap-1">
@@ -116,13 +119,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </button>
           </div>
         </header>
-        <main className="flex-1 bg-cream p-5 pb-24 md:p-8">{children}</main>
+        <main className="flex-1 bg-cream p-5 pt-24 pb-32 md:p-8">{children}</main>
       </div>
 
       {/* Mobile bottom tab bar */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-edge/[.07] bg-surface md:hidden"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-edge/[.07] bg-surface px-1 md:hidden"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 10px)" }}
       >
         {NAV.map((n) => {
           const active = n.href === "/admin" ? path === "/admin" : path.startsWith(n.href);
@@ -130,7 +133,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Link
               key={n.href}
               href={n.href}
-              className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-bold leading-tight ${active ? "text-brand-700 dark:text-blue-300" : "text-muted"}`}
+              className={`flex flex-1 flex-col items-center gap-0.5 px-0.5 pt-2.5 pb-1 text-center text-[10px] font-bold leading-tight ${active ? "text-brand-700 dark:text-blue-300" : "text-muted"}`}
             >
               <Icon name={n.icon} size={20} />
               {n.shortLabel}
