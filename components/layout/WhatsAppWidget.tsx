@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Icon } from "@/components/ui/Icon";
+import { useStore } from "@/lib/store";
 
 const WA = process.env.NEXT_PUBLIC_WA_NUMBER || "6281234567890";
 
@@ -23,7 +24,9 @@ export function waLinkTo(phone: string, message: string) {
 }
 
 export function WhatsAppWidget({ context }: { context?: string }) {
+  const { isAdmin } = useStore();
   const msg = context ? `Hi Titipin! ${context}` : "Hi Titipin! I have a question about jastip.";
+  if (isAdmin) return null;
   return (
     <a
       href={waLink(msg)} target="_blank" rel="noreferrer"
