@@ -8,12 +8,12 @@ import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 
 const NAV = [
-  { href: "/admin", icon: "layout-dashboard", label: "Overview" },
-  { href: "/admin/requests", icon: "inbox", label: "Request Inbox" },
-  { href: "/admin/orders", icon: "clipboard-list", label: "Orders" },
-  { href: "/admin/catalog", icon: "package", label: "Catalog" },
-  { href: "/admin/shopper-mode", icon: "shopping-bag", label: "Shopper Mode" },
-  { href: "/admin/pricing", icon: "sliders-horizontal", label: "Pricing Engine" }
+  { href: "/admin", icon: "layout-dashboard", label: "Overview", shortLabel: "Overview" },
+  { href: "/admin/requests", icon: "inbox", label: "Request Inbox", shortLabel: "Requests" },
+  { href: "/admin/orders", icon: "clipboard-list", label: "Orders", shortLabel: "Orders" },
+  { href: "/admin/catalog", icon: "package", label: "Catalog", shortLabel: "Catalog" },
+  { href: "/admin/shopper-mode", icon: "shopping-bag", label: "Shopper Mode", shortLabel: "Shopper" },
+  { href: "/admin/pricing", icon: "sliders-horizontal", label: "Pricing Engine", shortLabel: "Pricing" }
 ];
 
 interface BeforeInstallPromptEvent extends Event {
@@ -115,14 +115,29 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Icon name={theme === "dark" ? "sun" : "moon"} size={15} />
             </button>
           </div>
-          <div className="flex gap-1 overflow-x-auto">
-            {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className={`flex-none rounded-lg p-2 ${path === n.href ? "bg-brand-50 dark:bg-brand/15 text-brand-700 dark:text-blue-300" : "text-muted"}`}><Icon name={n.icon} size={18} /></Link>
-            ))}
-          </div>
         </header>
-        <main className="flex-1 bg-cream p-5 md:p-8">{children}</main>
+        <main className="flex-1 bg-cream p-5 pb-24 md:p-8">{children}</main>
       </div>
+
+      {/* Mobile bottom tab bar */}
+      <nav
+        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-edge/[.07] bg-surface md:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        {NAV.map((n) => {
+          const active = n.href === "/admin" ? path === "/admin" : path.startsWith(n.href);
+          return (
+            <Link
+              key={n.href}
+              href={n.href}
+              className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-bold leading-tight ${active ? "text-brand-700 dark:text-blue-300" : "text-muted"}`}
+            >
+              <Icon name={n.icon} size={20} />
+              {n.shortLabel}
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
