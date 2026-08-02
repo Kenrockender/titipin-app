@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
@@ -25,6 +25,19 @@ function ProfileForm() {
   const [whatsapp, setWhatsapp] = useState(currentUser?.whatsapp_number ?? "");
   const [address, setAddress] = useState(currentUser?.shipping_address ?? "");
   const [saved, setSaved] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  // currentUser loads asynchronously (auth resolves, then the profile doc is
+  // fetched) — useState's initializer only runs once, on mount, so without
+  // this the fields would always render blank even after real data arrives.
+  // Only sync once: after that, the user's own edits should win.
+  useEffect(() => {
+    if (currentUser && !hydrated) {
+      setWhatsapp(currentUser.whatsapp_number);
+      setAddress(currentUser.shipping_address);
+      setHydrated(true);
+    }
+  }, [currentUser, hydrated]);
 
   if (authLoading) return <main className="mx-auto max-w-md px-5 py-24 text-center text-muted">Loading…</main>;
   if (!currentUser) return <main className="mx-auto max-w-md px-5 py-24 text-center"><h1 className="text-2xl font-extrabold">Please log in</h1><p className="mt-1 text-muted">Log in to view your profile and store credit.</p><Link href="/login?next=/profile"><Button className="mt-4">Log In</Button></Link></main>;
