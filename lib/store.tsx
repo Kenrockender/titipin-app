@@ -1,17 +1,18 @@
 "use client";
-// Client-side data store. In mock mode it holds all app state in React context so
-// the whole flow (cart -> checkout -> DP -> Secured -> OOS -> store credit) works
-// end-to-end in the browser. Swap these actions for Supabase queries later.
+// Client-side data store. When Firebase is configured, trips/products/addOns/
+// pricing/requests/orders all live in Firestore and stay synced in real time via
+// onSnapshot; otherwise it falls back to the in-memory seed data in lib/mock-data.ts
+// so the app still runs standalone in demo mode.
 import React, { createContext, useContext, useMemo, useState, useCallback, useEffect } from "react";
 import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot, orderBy, query, setDoc, updateDoc } from "firebase/firestore";
 import type {
   AddOn, CatalogProduct, CustomRequest, DeliveryMethod, ItemStatus, Order, OrderItem,
   OrderStatus, PricingConfig, RequestStatus, Trip, User
 } from "@/types/database.types";
 import { DEFAULT_PRICING, calculateDP } from "@/lib/pricing";
 import * as seed from "@/lib/mock-data";
-import { auth, db, googleProvider } from "@/lib/firebase/client";
+import { auth, db, googleProvider, isFirebaseConfigured } from "@/lib/firebase/client";
 import { notifyTelegram } from "@/lib/telegram";
 import { formatIDR, shortId } from "@/lib/format";
 import { BANK_ACCOUNT_INFO } from "@/lib/constants";
@@ -69,15 +70,44 @@ export function isAdminEmail(email: string) {
   return email.trim().toLowerCase() === ADMIN_EMAIL;
 }
 
+// Subscribes to a Firestore collection and mirrors it into local state; falls
+// back to the given seed array (with a plain local setter) when Firebase isn't
+// configured, so the store keeps working standalone in demo mode.
+function useFirestoreCollection<T>(name: string, seedValue: T[], orderByField?: string) {
+  const [items, setItems] = useState<T[]>(seedValue);
+  useEffect(() => {
+    if (!db) return;
+    const ref = orderByField ? query(collection(db, name), orderBy(orderByField, "desc")) : collection(db, name);
+    const unsub = onSnapshot(ref, (snap) => {
+      setItems(snap.docs.map((d) => d.data() as T));
+    }, () => {});
+    return unsub;
+  }, [name, orderByField]);
+  return [items, setItems] as const;
+}
+
+function useFirestoreDoc<T>(path: [string, string], seedValue: T) {
+  const [value, setValue] = useState<T>(seedValue);
+  useEffect(() => {
+    if (!db) return;
+    const unsub = onSnapshot(doc(db, ...path), (snap) => {
+      if (snap.exists()) setValue(snap.data() as T);
+    }, () => {});
+    return unsub;
+  }, [path[0], path[1]]);
+  return [value, setValue] as const;
+}
+
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
-  const [trips, setTrips] = useState<Trip[]>(seed.trips);
-  const [products, setProducts] = useState<CatalogProduct[]>(seed.products);
-  const [requests, setRequests] = useState<CustomRequest[]>(seed.requests);
-  const [orders, setOrders] = useState<Order[]>(seed.orders);
-  const [pricing, setPricing] = useState<PricingConfig>(DEFAULT_PRICING);
+  const [trips, setTripsFallback] = useFirestoreCollection<Trip>("trips", seed.trips);
+  const [products, setProductsFallback] = useFirestoreCollection<CatalogProduct>("products", seed.products);
+  const [addOns] = useFirestoreCollection<AddOn>("addOns", seed.addOns);
+  const [requests, setRequestsFallback] = useFirestoreCollection<CustomRequest>("requests", seed.requests, "created_at");
+  const [orders, setOrdersFallback] = useFirestoreCollection<Order>("orders", seed.orders, "created_at");
+  const [pricing, setPricingFallback] = useFirestoreDoc<PricingConfig>(["config", "pricing"], DEFAULT_PRICING);
   const [cart, setCart] = useState<CartLine[]>([]);
   const [cartHydrated, setCartHydrated] = useState(false);
 
@@ -184,7 +214,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       status: "Pending Review", quoted_price_idr: null, required_dp_idr: null,
       created_at: new Date().toISOString()
     };
-    setRequests((rs) => [row, ...rs]);
+    if (db) setDoc(doc(db, "requests", id), row).catch(() => {});
+    else setRequestsFallback((rs) => [row, ...rs]);
     notifyTelegram(
       `🆕 Request baru dari ${currentUser?.full_name ?? "Guest"} (${currentUser?.email ?? "-"})\n` +
       `Produk: ${row.product_name_or_desc}\n` +
@@ -203,7 +234,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       store_location: l.product.store_location ?? "TBD", item_status: "Pending Purchase",
       admin_receipt_url: null, image_url: l.product.image_url
     }));
-    const addonTotal = addonIds.reduce((s, aid) => s + (seed.addOns.find((a) => a.id === aid)?.price_idr ?? 0), 0);
+    const addonTotal = addonIds.reduce((s, aid) => s + (addOns.find((a) => a.id === aid)?.price_idr ?? 0), 0);
     const total = items.reduce((s, i) => s + i.locked_price_idr * i.quantity, 0) + addonTotal;
     const order: Order = {
       id, user_id: currentUser?.id ?? "guest",
@@ -214,7 +245,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       local_shipping_fee_idr: null, delivery_method: deliveryMethod, status: "Waiting DP",
       created_at: new Date().toISOString(), items, addon_ids: addonIds
     };
-    setOrders((os) => [order, ...os]);
+    if (db) setDoc(doc(db, "orders", id), order).catch(() => {});
+    else setOrdersFallback((os) => [order, ...os]);
     setCart([]);
     notifyTelegram(
       `🛒 Order baru #${shortId(id)} dari ${currentUser?.full_name ?? "Guest"} (${currentUser?.email ?? "-"})\n` +
@@ -223,12 +255,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       `Delivery: ${deliveryMethod}`
     );
     return id;
-  }, [cart, currentUser, products]);
+  }, [cart, currentUser, products, addOns]);
 
   const markPayment = useCallback<StoreActions["markPayment"]>((orderId, type) => {
-    setOrders((os) => os.map((o) => o.id === orderId
-      ? { ...o, status: type === "Down Payment" ? "DP Paid" : "Completed" } : o));
     const order = orders.find((o) => o.id === orderId);
+    const newStatus: OrderStatus = type === "Down Payment" ? "DP Paid" : "Completed";
+    if (db) updateDoc(doc(db, "orders", orderId), { status: newStatus }).catch(() => {});
+    else setOrdersFallback((os) => os.map((o) => o.id === orderId ? { ...o, status: newStatus } : o));
     if (order) {
       const amount = type === "Down Payment"
         ? order.total_dp_required_idr
@@ -242,8 +275,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [orders]);
 
   const quoteRequest = useCallback<StoreActions["quoteRequest"]>((id, quotedIdr, dpIdr) => {
-    setRequests((rs) => rs.map((r) => r.id === id
-      ? { ...r, status: "Quote Sent", quoted_price_idr: quotedIdr, required_dp_idr: dpIdr } : r));
+    const patch = { status: "Quote Sent" as RequestStatus, quoted_price_idr: quotedIdr, required_dp_idr: dpIdr };
+    if (db) updateDoc(doc(db, "requests", id), patch).catch(() => {});
+    else setRequestsFallback((rs) => rs.map((r) => r.id === id ? { ...r, ...patch } : r));
   }, []);
 
   // Turns a quoted custom request into a real Order, so it goes through the
@@ -268,8 +302,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       local_shipping_fee_idr: null, delivery_method: "Pickup", status: "Waiting DP",
       created_at: new Date().toISOString(), items: [item], addon_ids: []
     };
-    setOrders((os) => [order, ...os]);
-    setRequests((rs) => rs.map((r) => r.id === requestId ? { ...r, status: "Accepted" } : r));
+    if (db) {
+      setDoc(doc(db, "orders", orderId), order).catch(() => {});
+      updateDoc(doc(db, "requests", requestId), { status: "Accepted" }).catch(() => {});
+    } else {
+      setOrdersFallback((os) => [order, ...os]);
+      setRequestsFallback((rs) => rs.map((r) => r.id === requestId ? { ...r, status: "Accepted" } : r));
+    }
     notifyTelegram(
       `✅ ${req.customer_name} terima quote buat "${req.product_name_or_desc}"\n` +
       `Order baru #${shortId(orderId)} otomatis dibuat — Total: ${formatIDR(req.quoted_price_idr)} · DP: ${formatIDR(req.required_dp_idr)}`
@@ -278,25 +317,32 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [requests, trips]);
 
   const setRequestStatus = useCallback<StoreActions["setRequestStatus"]>((id, status) => {
-    setRequests((rs) => rs.map((r) => r.id === id ? { ...r, status } : r));
+    if (db) updateDoc(doc(db, "requests", id), { status }).catch(() => {});
+    else setRequestsFallback((rs) => rs.map((r) => r.id === id ? { ...r, status } : r));
   }, []);
 
   const setItemStatus = useCallback<StoreActions["setItemStatus"]>((orderId, itemId, status) => {
-    setOrders((os) => os.map((o) => o.id !== orderId ? o : {
-      ...o, items: o.items.map((it) => it.id === itemId ? { ...it, item_status: status } : it)
-    }));
-  }, []);
+    const order = orders.find((o) => o.id === orderId);
+    if (!order) return;
+    const items = order.items.map((it) => it.id === itemId ? { ...it, item_status: status } : it);
+    if (db) updateDoc(doc(db, "orders", orderId), { items }).catch(() => {});
+    else setOrdersFallback((os) => os.map((o) => o.id === orderId ? { ...o, items } : o));
+  }, [orders]);
+
   const setOrderStatus = useCallback<StoreActions["setOrderStatus"]>((orderId, status) => {
-    setOrders((os) => os.map((o) => o.id === orderId ? { ...o, status } : o));
+    if (db) updateDoc(doc(db, "orders", orderId), { status }).catch(() => {});
+    else setOrdersFallback((os) => os.map((o) => o.id === orderId ? { ...o, status } : o));
   }, []);
 
   const refundAsStoreCredit = useCallback<StoreActions["refundAsStoreCredit"]>((orderId, itemId) => {
-    setOrders((os) => os.map((o) => {
-      if (o.id !== orderId) return o;
-      return { ...o, items: o.items.map((i) => i.id === itemId ? { ...i, item_status: "Out of Stock" } : i) };
-    }));
-    const item = orders.find((o) => o.id === orderId)?.items.find((i) => i.id === itemId);
-    if (item) setCurrentUser((u) => {
+    const order = orders.find((o) => o.id === orderId);
+    const item = order?.items.find((i) => i.id === itemId);
+    if (!order || !item) return;
+    const items = order.items.map((i) => i.id === itemId ? { ...i, item_status: "Out of Stock" as ItemStatus } : i);
+    if (db) updateDoc(doc(db, "orders", orderId), { items }).catch(() => {});
+    else setOrdersFallback((os) => os.map((o) => o.id === orderId ? { ...o, items } : o));
+
+    setCurrentUser((u) => {
       if (!u) return u;
       const updated = { ...u, store_credit_balance: u.store_credit_balance + item.locked_price_idr * item.quantity };
       if (db) setDoc(doc(db, "users", updated.id), updated, { merge: true }).catch(() => {});
@@ -305,22 +351,30 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [orders]);
 
   const upsertProduct = useCallback<StoreActions["upsertProduct"]>((p) => {
-    setProducts((ps) => ps.some((x) => x.id === p.id) ? ps.map((x) => x.id === p.id ? p : x) : [p, ...ps]);
+    if (db) setDoc(doc(db, "products", p.id), p).catch(() => {});
+    else setProductsFallback((ps) => ps.some((x) => x.id === p.id) ? ps.map((x) => x.id === p.id ? p : x) : [p, ...ps]);
   }, []);
-  const toggleProductActive = useCallback((id: string) => {
-    setProducts((ps) => ps.map((p) => p.id === id ? { ...p, is_active: !p.is_active } : p));
+  const toggleProductActive = useCallback<StoreActions["toggleProductActive"]>((id) => {
+    const product = products.find((p) => p.id === id);
+    if (!product) return;
+    if (db) updateDoc(doc(db, "products", id), { is_active: !product.is_active }).catch(() => {});
+    else setProductsFallback((ps) => ps.map((p) => p.id === id ? { ...p, is_active: !p.is_active } : p));
+  }, [products]);
+  const updatePricing = useCallback<StoreActions["updatePricing"]>((p) => {
+    if (db) setDoc(doc(db, "config", "pricing"), p).catch(() => {});
+    else setPricingFallback(p);
   }, []);
-  const updatePricing = useCallback((p: PricingConfig) => setPricing(p), []);
-  const updateTripRate = useCallback((tripId: string, rate: number) => {
-    setTrips((ts) => ts.map((t) => t.id === tripId ? { ...t, system_exchange_rate: rate } : t));
+  const updateTripRate = useCallback<StoreActions["updateTripRate"]>((tripId, rate) => {
+    if (db) updateDoc(doc(db, "trips", tripId), { system_exchange_rate: rate }).catch(() => {});
+    else setTripsFallback((ts) => ts.map((t) => t.id === tripId ? { ...t, system_exchange_rate: rate } : t));
   }, []);
 
   const value = useMemo(() => ({
-    currentUser, isAdmin, authLoading, trips, products, requests, orders, addOns: seed.addOns, pricing, cart, hauls: seed.hauls, heroHauls: seed.heroHauls,
+    currentUser, isAdmin, authLoading, trips, products, requests, orders, addOns, pricing, cart, hauls: seed.hauls, heroHauls: seed.heroHauls,
     signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, decrementCartItem, clearCart, submitRequest,
     placeOrder, markPayment, quoteRequest, acceptQuote, setRequestStatus, setItemStatus, setOrderStatus,
     refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing, updateTripRate
-  }), [currentUser, isAdmin, authLoading, trips, products, requests, orders, pricing, cart,
+  }), [currentUser, isAdmin, authLoading, trips, products, requests, orders, addOns, pricing, cart,
     signInWithGoogle, logout, updateProfile, addToCart, removeFromCart, decrementCartItem, clearCart, submitRequest,
     placeOrder, markPayment, quoteRequest, acceptQuote, setRequestStatus, setItemStatus, setOrderStatus,
     refundAsStoreCredit, upsertProduct, toggleProductActive, updatePricing, updateTripRate]);
