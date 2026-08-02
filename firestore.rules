@@ -29,11 +29,12 @@ service cloud.firestore {
     }
 
     // Custom requests: anyone (incl. guests) can submit one; only the
-    // requester or the admin can read it; only the admin can quote/reject it.
+    // requester or the admin can read it. The admin quotes/rejects it; the
+    // requester can accept a quote (status -> Accepted, which spawns an Order).
     match /requests/{requestId} {
       allow read: if isAdmin() || (request.auth != null && resource.data.user_id == request.auth.uid);
       allow create: if true;
-      allow update: if isAdmin();
+      allow update: if isAdmin() || (request.auth != null && resource.data.user_id == request.auth.uid);
     }
 
     // Orders: must be signed in to create one for yourself; the owner or the

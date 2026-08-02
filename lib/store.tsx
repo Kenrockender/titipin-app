@@ -5,7 +5,7 @@
 // so the app still runs standalone in demo mode.
 import React, { createContext, useContext, useMemo, useState, useCallback, useEffect } from "react";
 import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
-import { collection, doc, getDoc, onSnapshot, orderBy, query, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
 import type {
   AddOn, CatalogProduct, CustomRequest, DeliveryMethod, ItemStatus, Order, OrderItem,
   OrderStatus, PricingConfig, RequestStatus, Trip, User
@@ -73,16 +73,37 @@ export function isAdminEmail(email: string) {
 // Subscribes to a Firestore collection and mirrors it into local state; falls
 // back to the given seed array (with a plain local setter) when Firebase isn't
 // configured, so the store keeps working standalone in demo mode.
-function useFirestoreCollection<T>(name: string, seedValue: T[], orderByField?: string) {
+function useFirestoreCollection<T>(name: string, seedValue: T[]) {
   const [items, setItems] = useState<T[]>(seedValue);
   useEffect(() => {
     if (!db) return;
-    const ref = orderByField ? query(collection(db, name), orderBy(orderByField, "desc")) : collection(db, name);
-    const unsub = onSnapshot(ref, (snap) => {
+    const unsub = onSnapshot(collection(db, name), (snap) => {
       setItems(snap.docs.map((d) => d.data() as T));
     }, () => {});
     return unsub;
-  }, [name, orderByField]);
+  }, [name]);
+  return [items, setItems] as const;
+}
+
+// Orders/requests are only readable by their owner or the admin (Firestore
+// rules), so an unscoped collection listener gets rejected for a regular
+// customer. Scope the query by user_id once we know who's signed in, and
+// sort client-side to avoid needing a composite (user_id + created_at) index.
+function useOwnedCollection<T>(
+  name: string, seedValue: T[], currentUser: User | null, isAdmin: boolean, authLoading: boolean
+) {
+  const [items, setItems] = useState<T[]>(seedValue);
+  useEffect(() => {
+    if (!db || authLoading) return;
+    if (!currentUser) { setItems([]); return; }
+    const ref = isAdmin ? collection(db, name) : query(collection(db, name), where("user_id", "==", currentUser.id));
+    const unsub = onSnapshot(ref, (snap) => {
+      const rows = snap.docs.map((d) => d.data() as T);
+      rows.sort((a, b) => String((b as { created_at?: string }).created_at ?? "").localeCompare(String((a as { created_at?: string }).created_at ?? "")));
+      setItems(rows);
+    }, () => {});
+    return unsub;
+  }, [name, currentUser?.id, isAdmin, authLoading]);
   return [items, setItems] as const;
 }
 
@@ -105,8 +126,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [trips, setTripsFallback] = useFirestoreCollection<Trip>("trips", seed.trips);
   const [products, setProductsFallback] = useFirestoreCollection<CatalogProduct>("products", seed.products);
   const [addOns] = useFirestoreCollection<AddOn>("addOns", seed.addOns);
-  const [requests, setRequestsFallback] = useFirestoreCollection<CustomRequest>("requests", seed.requests, "created_at");
-  const [orders, setOrdersFallback] = useFirestoreCollection<Order>("orders", seed.orders, "created_at");
+  const [requests, setRequestsFallback] = useOwnedCollection<CustomRequest>("requests", seed.requests, currentUser, isAdmin, authLoading);
+  const [orders, setOrdersFallback] = useOwnedCollection<Order>("orders", seed.orders, currentUser, isAdmin, authLoading);
   const [pricing, setPricingFallback] = useFirestoreDoc<PricingConfig>(["config", "pricing"], DEFAULT_PRICING);
   const [cart, setCart] = useState<CartLine[]>([]);
   const [cartHydrated, setCartHydrated] = useState(false);
