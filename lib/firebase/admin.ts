@@ -8,7 +8,6 @@
 // there), FIREBASE_SERVICE_ACCOUNT_PATH (a local file path, for dev).
 import { cert, getApps, initializeApp, type App, type ServiceAccount } from "firebase-admin/app";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
-import { getAuth, type Auth } from "firebase-admin/auth";
 import fs from "node:fs";
 
 const DATABASE_ID = process.env.FIRESTORE_DATABASE_ID || "(default)";
@@ -39,9 +38,4 @@ function getAdminApp(): App | null {
 export function adminDb(): Firestore | null {
   const app = getAdminApp();
   return app ? getFirestore(app, DATABASE_ID) : null;
-}
-
-export function adminAuth(): Auth | null {
-  const app = getAdminApp();
-  return app ? getAuth(app) : null;
 }
